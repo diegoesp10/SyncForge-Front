@@ -1,6 +1,7 @@
 import { useRef, useState, type DragEvent } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { Composition } from './Composition';
+import { SUPPORTED_EXTENSIONS } from '../utils/format';
 
 interface Props {
   onFiles: (files: File[]) => void;
@@ -46,7 +47,7 @@ export function Dropzone({ onFiles, maxMb }: Props) {
           <p className="dz-title">
             {over ? <>Suéltalos<br /><em>aquí mismo.</em></> : <>Arrastra tus archivos<br /><em>o selecciónalos.</em></>}
           </p>
-          <p className="dz-hint">CSV, JSON, TXT, XML, XLSX… · hasta {maxMb} MB por archivo</p>
+          <p className="dz-hint">{SUPPORTED_EXTENSIONS.join(', ').toUpperCase()} · hasta {maxMb} MB por archivo</p>
           <span className="btn-primary dz-btn" aria-hidden>
             <ArrowUp size={16} /> Seleccionar archivos
           </span>
@@ -57,6 +58,7 @@ export function Dropzone({ onFiles, maxMb }: Props) {
         ref={input}
         type="file"
         multiple
+        accept={SUPPORTED_EXTENSIONS.map((e) => `.${e}`).join(',')}
         hidden
         onChange={(e) => {
           const files = Array.from(e.target.files ?? []);

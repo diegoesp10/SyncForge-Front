@@ -97,7 +97,7 @@ Variables del archivo `.env`:
 | Variable | Descripción | Valor por defecto |
 |---|---|---|
 | `VITE_USE_MOCK` | `true`: backend simulado en el navegador. `false`: usa la API real | `true` |
-| `VITE_BACKEND_URL` | URL del backend .NET a la que Vite reenvía las peticiones a `/api` en desarrollo | `https://localhost:7001` |
+| `VITE_BACKEND_URL` | URL del backend .NET a la que Vite reenvía las peticiones a `/api` en desarrollo | `http://localhost:5254` |
 | `VITE_MAX_FILE_MB` | Tamaño máximo por archivo que admite el frontal, en MB | `50` |
 
 Vite lee el `.env` al arrancar: después de modificarlo, detén el servidor y vuelve a ejecutar `pnpm dev`.
@@ -116,7 +116,7 @@ Antes de subir cambios, `pnpm build` debe terminar sin errores.
 ## Conectar con el backend .NET
 
 1. Arranca la API .NET.
-2. En el `.env`, pon `VITE_USE_MOCK=false` y ajusta `VITE_BACKEND_URL` a la URL de la API (la que aparece en su `launchSettings.json`).
+2. En el `.env`, pon `VITE_USE_MOCK=false`. `VITE_BACKEND_URL` ya apunta al perfil `http` de la API (`http://localhost:5254`); cámbialo solo si la levantas en otra URL (por ejemplo `https://localhost:7233` con el perfil `https`).
 3. Reinicia `pnpm dev`.
 
 En desarrollo, Vite actúa de **proxy**: todas las peticiones a `/api/*` se reenvían a `VITE_BACKEND_URL`. Así no hace falta configurar CORS en el backend, y se acepta el certificado HTTPS de desarrollo de .NET.

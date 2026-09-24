@@ -16,7 +16,7 @@ export function FilePreview({ preview }: { preview: FileResult['preview'] }) {
               <tr key={i}>
                 <td className="rownum">{i + 1}</td>
                 {r.map((c, j) => (
-                  <td key={j} className={typeof c === 'number' ? 'num' : undefined}>{c ?? <span className="muted">null</span>}</td>
+                  <td key={j} className={isNumeric(c) ? 'num' : undefined}>{c ?? <span className="muted">null</span>}</td>
                 ))}
               </tr>
             ))}
@@ -29,6 +29,11 @@ export function FilePreview({ preview }: { preview: FileResult['preview'] }) {
     return <pre className="code-block" dangerouslySetInnerHTML={{ __html: highlightJson(preview.json) }} />;
   }
   return <pre className="code-block plain">{preview.text}</pre>;
+}
+
+// Las filas llegan como texto desde la API; "1861.5" o "-3,25" se tratan como número para alinearlas
+function isNumeric(c: string | number | null) {
+  return typeof c === 'number' || (typeof c === 'string' && /^-?\d+(?:[.,]\d+)?$/.test(c.trim()));
 }
 
 function esc(s: string) {

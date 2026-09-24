@@ -3,6 +3,8 @@ import { mockApi } from './mock';
 
 export const USE_MOCK = import.meta.env.VITE_USE_MOCK !== 'false';
 const BASE = '/api';
+// La API traduce errores y avisos según Accept-Language (o ?language=); la interfaz está en español
+const LANGUAGE = 'es';
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -11,7 +13,7 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, init);
+  const res = await fetch(`${BASE}${path}`, { ...init, headers: { 'Accept-Language': LANGUAGE, ...init?.headers } });
   if (!res.ok) {
     let msg = `${res.status} ${res.statusText}`;
     try {
@@ -39,6 +41,7 @@ function uploadWithProgress(
     form.append('file', file, file.name);
 
     xhr.open('POST', `${BASE}/files`);
+    xhr.setRequestHeader('Accept-Language', LANGUAGE);
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100));
     };

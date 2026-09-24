@@ -31,6 +31,9 @@ export function extOf(name: string): string {
   return i >= 0 ? name.slice(i + 1).toLowerCase() : '';
 }
 
+// Extensiones que analiza el backend; cualquier otra termina en Failed (formato no soportado)
+export const SUPPORTED_EXTENSIONS = ['csv', 'tsv', 'json', 'txt', 'log', 'xml', 'md'];
+
 export type FileFamily = 'table' | 'code' | 'text' | 'sheet' | 'other';
 
 export function familyOf(name: string): FileFamily {
