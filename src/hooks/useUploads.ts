@@ -1,12 +1,22 @@
 import { useCallback, useRef, useState } from 'react';
-import { api } from '../api/client';
+import { api, ApiError } from '../api/client';
+import { validateFile, type RejectCode } from '../utils/validateFile';
 
 export interface UploadTask {
   key: string;
   file: File;
   progress: number;
-  state: 'uploading' | 'done' | 'error';
+  /** rejected: lo descartó la validación del frontal · error: lo rechazó la API o falló la conexión */
+  state: 'uploading' | 'done' | 'error' | 'rejected';
   error?: string;
+  reason?: RejectCode;
+  /** Código HTTP devuelto por la API (0 si no hubo respuesta) */
+  status?: number;
+}
+
+export interface AddResult {
+  accepted: number;
+  rejected: number;
 }
 
 const MAX_MB = Number(import.meta.env.VITE_MAX_FILE_MB ?? 50);
@@ -34,7 +44,13 @@ export function useUploads(onUploaded: () => void) {
           onUploaded();
           setTimeout(() => setTasks((ts) => ts.filter((t) => t.key !== task.key)), 2500);
         })
-        .catch((e: Error) => patch(task.key, { state: 'error', error: e.message }))
+        .catch((e: unknown) =>
+          patch(task.key, {
+            state: 'error',
+            error: e instanceof Error ? e.message : 'No se pudo subir el archivo',
+            status: e instanceof ApiError ? e.status : undefined,
+          }),
+        )
         .finally(() => {
           controllers.current.delete(task.key);
           active.current--;
@@ -43,21 +59,23 @@ export function useUploads(onUploaded: () => void) {
     }
   }, [onUploaded]);
 
+  /** Valida cada archivo y solo encola los admitidos; los demás quedan en la lista con su motivo. */
   const add = useCallback(
-    (files: File[]) => {
-      const created: UploadTask[] = files.map((file) => {
-        const tooBig = file.size > MAX_MB * 1024 * 1024;
-        return {
-          key: crypto.randomUUID(),
-          file,
-          progress: 0,
-          state: tooBig ? 'error' : 'uploading',
-          error: tooBig ? `Supera el máximo de ${MAX_MB} MB` : undefined,
-        };
-      });
+    async (files: File[]): Promise<AddResult> => {
+      const checked = await Promise.all(files.map(async (file) => ({ file, rejection: await validateFile(file, MAX_MB) })));
+      const created: UploadTask[] = checked.map(({ file, rejection }) => ({
+        key: crypto.randomUUID(),
+        file,
+        progress: 0,
+        state: rejection ? 'rejected' : 'uploading',
+        error: rejection?.message,
+        reason: rejection?.code,
+      }));
       setTasks((ts) => [...created, ...ts]);
       queue.current.push(...created.filter((t) => t.state === 'uploading'));
       pump();
+      const accepted = created.filter((t) => t.state === 'uploading').length;
+      return { accepted, rejected: created.length - accepted };
     },
     [pump],
   );

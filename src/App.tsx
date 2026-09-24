@@ -48,9 +48,11 @@ export default function App() {
   const open = (f: FileItem) => setOpenId(f.id);
   const close = useCallback(() => setOpenId(null), []);
 
-  const handleFiles = (list: File[]) => {
-    uploads.add(list);
-    toast(list.length === 1 ? `Subiendo ${list[0].name}` : `Subiendo ${list.length} archivos`);
+  const handleFiles = async (list: File[]) => {
+    const result = await uploads.add(list);
+    if (result.accepted) toast(result.accepted === 1 ? 'Subiendo 1 archivo' : `Subiendo ${result.accepted} archivos`);
+    if (result.rejected) toast(result.rejected === 1 ? '1 archivo no admitido' : `${result.rejected} archivos no admitidos`, 'err');
+    return result;
   };
 
   const handleDelete = async (id: string) => {
@@ -86,7 +88,7 @@ export default function App() {
               <StatCards files={files} />
               <div className="dash-upload">
                 <Dropzone onFiles={handleFiles} maxMb={uploads.maxMb} uploading={uploading} />
-                <UploadQueue tasks={uploads.tasks} onCancel={uploads.cancel} onClear={uploads.clearFinished} />
+                <UploadQueue tasks={uploads.tasks} maxMb={uploads.maxMb} onCancel={uploads.cancel} onClear={uploads.clearFinished} />
               </div>
               <FileList
                 title="Recientes"

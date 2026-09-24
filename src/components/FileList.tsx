@@ -107,7 +107,10 @@ export function FileList({ files, loading, error, title = 'Archivos', limit, onO
                   <td className="col-name">
                     <div className="name-cell">
                       <FileIcon name={f.fileName} />
-                      <span title={f.fileName}>{f.fileName}</span>
+                      <div className="name-text">
+                        <span title={f.fileName}>{f.fileName}</span>
+                        {f.status === 'Failed' && f.error && <span className="row-error" title={f.error}>{f.error}</span>}
+                      </div>
                     </div>
                   </td>
                   <td className="col-type"><span className="ext">{extOf(f.fileName) || '—'}</span></td>
@@ -125,9 +128,13 @@ export function FileList({ files, loading, error, title = 'Archivos', limit, onO
                 <FileIcon name={f.fileName} size={20} />
                 <div className="fc-body">
                   <span className="fc-name" title={f.fileName}>{f.fileName}</span>
-                  <span className="fc-meta">
-                    <span className="mono">{formatBytes(f.size)}</span> · {timeAgo(f.uploadedAt)}
-                  </span>
+                  {f.status === 'Failed' && f.error ? (
+                    <span className="fc-meta row-error">{f.error}</span>
+                  ) : (
+                    <span className="fc-meta">
+                      <span className="mono">{formatBytes(f.size)}</span> · {timeAgo(f.uploadedAt)}
+                    </span>
+                  )}
                 </div>
                 <StatusBadge status={f.status} progress={f.progress} />
               </li>

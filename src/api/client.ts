@@ -13,16 +13,27 @@ export class ApiError extends Error {
 const UNREACHABLE = 'No se pudo conectar con la API. Comprueba que está levantada.';
 
 /** Mensaje para una respuesta de error: el ProblemDetails de ASP.NET Core o, si no lo hay, uno legible. */
+const FALLBACKS: Record<number, string> = {
+  400: 'La API ha rechazado la petición por no ser válida.',
+  404: 'El archivo ya no existe en la API.',
+  409: 'La operación no es posible en el estado actual del archivo.',
+  413: 'El archivo supera el tamaño máximo que admite la API.',
+  415: 'La API no admite este tipo de contenido.',
+  502: UNREACHABLE,
+  503: UNREACHABLE,
+  504: UNREACHABLE,
+};
+
 function errorMessage(status: number, statusText: string, body: string): string {
   try {
     const problem = JSON.parse(body);
-    if (problem.detail || problem.title) return problem.detail || problem.title;
+    const text = [problem?.detail, problem?.title].find((v) => typeof v === 'string' && v.trim());
+    // Solo texto, recortado: nunca se pinta como HTML (React lo escapa) ni se vuelca una respuesta enorme
+    if (text) return text.trim().slice(0, 300);
   } catch {
     /* sin ProblemDetails */
   }
-  // 502/503/504 sin ProblemDetails: el proxy de Vite (o nginx) no llega a la API
-  if (status === 502 || status === 503 || status === 504) return UNREACHABLE;
-  return `Error ${status}${statusText ? ` · ${statusText}` : ''}`;
+  return FALLBACKS[status] ?? `Error ${status}${statusText ? ` · ${statusText}` : ''}`;
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {

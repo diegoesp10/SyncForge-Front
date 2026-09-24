@@ -7,7 +7,7 @@ import { AsyncButton } from './AsyncButton';
 import { Loader, LoadingState } from './Loader';
 import { StatusBadge } from './StatusBadge';
 import { FilePreview } from './FilePreview';
-import { formatBytes, formatDate } from '../utils/format';
+import { extOf, formatBytes, formatDate, SUPPORTED_EXTENSIONS } from '../utils/format';
 
 interface Props {
   file: FileItem | null;
@@ -108,9 +108,18 @@ export function FileDetail({ file: current, onClose, onDelete, onReprocess }: Pr
               )}
 
               {file.status === 'Failed' && (
-                <div className="alert err">
-                  <AlertTriangle size={16} />
-                  <span>{file.error ?? 'El backend no pudo procesar el archivo.'}</span>
+                <div className="failure" role="alert">
+                  <span className="failure-mark" aria-hidden />
+                  <div>
+                    <span className="eyebrow">Respuesta de la API</span>
+                    <p className="failure-title">No se pudo procesar<span className="h1-dot">.</span></p>
+                    <p className="failure-reason">{file.error ?? 'La API no pudo procesar el archivo.'}</p>
+                    <p className="failure-hint">
+                      {SUPPORTED_EXTENSIONS.includes(extOf(file.fileName))
+                        ? 'Revisa el contenido del archivo (separadores, codificación UTF-8, JSON válido). Si lo corriges, súbelo de nuevo; si crees que es un fallo puntual, pulsa Reprocesar.'
+                        : `Este formato no se puede procesar. Conviértelo a uno de estos y súbelo de nuevo: ${SUPPORTED_EXTENSIONS.map((e) => `.${e}`).join(', ')}.`}
+                    </p>
+                  </div>
                 </div>
               )}
 
@@ -152,7 +161,7 @@ export function FileDetail({ file: current, onClose, onDelete, onReprocess }: Pr
                 Eliminar
               </AsyncButton>
               <div className="spacer" />
-              {(file.status === 'Failed' || file.status === 'Completed') && (
+              {(file.status === 'Failed' || file.status === 'Completed') && SUPPORTED_EXTENSIONS.includes(extOf(file.fileName)) && (
                 <AsyncButton className="btn-ghost" icon={<RotateCw size={16} />} busyLabel="Enviando…" onClick={() => onReprocess(file.id)}>
                   Reprocesar
                 </AsyncButton>

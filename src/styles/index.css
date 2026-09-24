@@ -444,6 +444,20 @@ button.conn:hover { border-color: var(--border-strong); color: var(--text); }
 }
 .dropzone:hover { border-color: var(--accent); }
 .dropzone.is-over { border-style: solid; border-color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, var(--surface)); }
+/* Rechazo: borde y fondo en bermellón, sacudida breve y la composición "se desordena" */
+.dropzone.is-rejected {
+  border-style: solid;
+  border-color: var(--red);
+  background: color-mix(in srgb, var(--red) 6%, var(--surface));
+  animation: shake 0.45s var(--ease);
+}
+.dropzone.is-rejected .dz-title em, .dropzone.is-rejected .eyebrow { color: var(--err); }
+.dropzone.is-rejected .dz-hint { color: var(--err); }
+.dropzone.is-rejected .sh-1 { transform: translate(-10%, 8%) scale(0.9); }
+.dropzone.is-rejected .sh-2 { transform: translateX(18%) rotate(35deg); }
+.dropzone.is-rejected .sh-3 { transform: translate(10%, 20%) rotate(-40deg); }
+.dropzone.is-rejected .sh-4 { transform: rotate(-30deg); }
+@keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
 .dz-inner { display: grid; gap: 22px; padding: clamp(22px, 2.4vw, 40px); align-items: center; }
 .dz-art { width: clamp(120px, 40cqi, 200px); justify-self: center; order: -1; }
 .dz-title {
@@ -485,9 +499,42 @@ button.conn:hover { border-color: var(--border-strong); color: var(--text); }
 .uq-top { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 8px; font-size: 13.5px; }
 .uq-name { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .uq-meta { color: var(--text-3); white-space: nowrap; font-family: var(--mono); font-size: 12px; }
-.uq-error .uq-meta { color: var(--err); font-family: var(--font); }
-.uq-error .progress-bar { background: var(--err); }
 .uq-done .progress-bar { background: var(--ok); }
+/* Archivos rechazados (frontal) o con error de la API */
+.uq-fail {
+  align-items: flex-start;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--red) 6%, transparent);
+  border-left: 3px solid var(--red);
+}
+.uq-fail .uq-top { margin-bottom: 4px; flex-wrap: wrap; justify-content: flex-start; row-gap: 4px; }
+.uq-fail .uq-name { flex: 1 1 150px; min-width: 0; }
+.uq-fail .icon-btn { width: 32px; height: 32px; }
+.uq-origin {
+  flex-shrink: 0;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--err);
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--err) 35%, transparent);
+}
+.uq-reason { font-size: 13px; color: var(--text-2); overflow-wrap: anywhere; }
+.uq-hint { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); font-size: 12.5px; color: var(--text-3); }
+.uq-hint b { font-family: var(--mono); font-weight: 500; color: var(--text-2); }
+.fail-chip {
+  align-self: center;
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 2px 10px;
+  border-radius: 999px;
+  color: var(--err);
+  background: var(--err-soft);
+}
+.fi-reject { --fi: var(--err); --fi-soft: var(--err-soft); }
 .uq-state.ok { display: grid; place-items: center; width: 38px; height: 38px; color: var(--ok); }
 .progress { height: 3px; border-radius: 99px; background: var(--surface-3); overflow: hidden; }
 .progress.lg { height: 4px; }
@@ -599,6 +646,8 @@ button.conn:hover { border-color: var(--border-strong); color: var(--text); }
 .table .num { text-align: right; }
 .name-cell { display: flex; align-items: center; gap: 14px; font-weight: 500; min-width: 0; }
 .name-cell span { overflow: hidden; text-overflow: ellipsis; }
+.name-text { display: flex; flex-direction: column; min-width: 0; }
+.row-error { color: var(--err); font-size: 12px; font-weight: 400; }
 .ext {
   font-family: var(--mono);
   font-size: 11px;
@@ -750,6 +799,41 @@ button.conn:hover { border-color: var(--border-strong); color: var(--text); }
 .alert.err { background: var(--err-soft); color: var(--err); }
 .alert.warn { background: var(--warn-soft); color: var(--warn); }
 .waiting { display: flex; align-items: center; gap: 16px; padding: 18px 20px; border-radius: var(--radius-sm); background: var(--accent-soft); color: var(--accent); }
+
+/* Fallo de procesado devuelto por la API: triángulo bermellón + motivo */
+.failure {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--red) 30%, var(--border));
+  background: color-mix(in srgb, var(--red) 6%, var(--surface));
+}
+.failure-mark {
+  position: relative;
+  flex-shrink: 0;
+  width: 0;
+  height: 0;
+  margin-top: 4px;
+  border-left: 22px solid transparent;
+  border-right: 22px solid transparent;
+  border-bottom: 38px solid var(--red);
+}
+.failure-mark::after {
+  content: '!';
+  position: absolute;
+  left: 50%;
+  top: 11px;
+  transform: translateX(-50%);
+  font-family: var(--serif);
+  font-size: 24px;
+  line-height: 1;
+  color: var(--surface);
+}
+.failure-title { font-family: var(--serif); font-size: 28px; line-height: 1.1; margin: 6px 0 8px; }
+.failure-reason { font-weight: 500; color: var(--err); overflow-wrap: anywhere; }
+.failure-hint { margin-top: 8px; font-size: 13px; color: var(--text-2); }
 
 /* Vista previa en tabla: desplazamiento horizontal con sombras que indican que hay más columnas */
 .preview-table-wrap {

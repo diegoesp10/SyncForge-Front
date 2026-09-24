@@ -19,6 +19,7 @@ Aplicación web para **subir archivos** y seguir cómo los procesa el backend de
 ## Funcionalidades
 
 - Subida por arrastrar y soltar o con selector, varios archivos a la vez (3 en paralelo), con progreso real y cancelación.
+- Validación antes de subir: solo formatos admitidos, sin archivos vacíos ni por encima del límite, nombres sin caracteres peligrosos y detección de binarios renombrados (PDF, ZIP/XLSX, ejecutables, imágenes). Los rechazos y los errores de la API se muestran con su motivo y su origen.
 - Panel con métricas y listado con búsqueda y filtros por estado.
 - Panel lateral de detalle: estado, resumen y vista previa del resultado (tabla, JSON o texto).
 - Actualización automática: cada 1 s mientras hay archivos en cola o procesándose, cada 8 s si no.
