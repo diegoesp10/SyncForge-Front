@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
-import { X, RotateCw, Trash2, Download, AlertTriangle, Loader2 } from 'lucide-react';
+import { X, RotateCw, Trash2, Download, AlertTriangle } from 'lucide-react';
 import { api } from '../api/client';
 import type { FileItem, FileResult } from '../api/types';
 import { FileIcon } from './FileIcon';
+import { AsyncButton } from './AsyncButton';
+import { Loader, LoadingState } from './Loader';
 import { StatusBadge } from './StatusBadge';
 import { FilePreview } from './FilePreview';
 import { formatBytes, formatDate } from '../utils/format';
@@ -58,14 +60,20 @@ export function FileDetail({ file: current, onClose, onDelete, onReprocess }: Pr
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose, isOpen]);
 
-  const download = () => {
-    if (!result || !file) return;
-    const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `${file.fileName}.result.json`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+  // Descarga el resultado recién pedido a la API (no el que se cargó al abrir el panel)
+  const download = async () => {
+    if (!file) return;
+    try {
+      const fresh = await api.getResult(file.id);
+      const blob = new Blob([JSON.stringify(fresh, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${file.fileName}.result.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'No se pudo descargar el resultado');
+    }
   };
 
   return (
@@ -108,12 +116,12 @@ export function FileDetail({ file: current, onClose, onDelete, onReprocess }: Pr
 
               {(file.status === 'Pending' || file.status === 'Processing') && (
                 <div className="waiting">
-                  <Loader2 className="spin" size={22} />
+                  <Loader label="Procesando" />
                   <p>El backend está leyendo el archivo. El resultado aparecerá aquí automáticamente.</p>
                 </div>
               )}
 
-              {loading && <div className="skeleton tall" />}
+              {loading && <LoadingState label="Leyendo el resultado…" />}
               {err && <div className="alert err"><AlertTriangle size={16} /><span>{err}</span></div>}
 
               {result && (
@@ -140,18 +148,18 @@ export function FileDetail({ file: current, onClose, onDelete, onReprocess }: Pr
             </div>
 
             <footer className="drawer-foot">
-              <button className="btn-ghost danger" onClick={() => onDelete(file.id).then(onClose)}>
-                <Trash2 size={16} /> Eliminar
-              </button>
+              <AsyncButton className="btn-ghost danger" icon={<Trash2 size={16} />} busyLabel="Eliminando…" aria-label="Eliminar archivo" onClick={() => onDelete(file.id).then(onClose)}>
+                Eliminar
+              </AsyncButton>
               <div className="spacer" />
               {(file.status === 'Failed' || file.status === 'Completed') && (
-                <button className="btn-ghost" onClick={() => onReprocess(file.id)}>
-                  <RotateCw size={16} /> Reprocesar
-                </button>
+                <AsyncButton className="btn-ghost" icon={<RotateCw size={16} />} busyLabel="Enviando…" onClick={() => onReprocess(file.id)}>
+                  Reprocesar
+                </AsyncButton>
               )}
-              <button className="btn-primary" disabled={!result} onClick={download}>
-                <Download size={16} /> Resultado
-              </button>
+              <AsyncButton className="btn-primary" icon={<Download size={16} />} busyLabel="Descargando…" disabled={!result} onClick={download}>
+                Resultado
+              </AsyncButton>
             </footer>
           </>
         )}

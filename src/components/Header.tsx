@@ -1,11 +1,13 @@
 import type { Theme } from '../hooks/useTheme';
+import type { BackendStatus } from '../hooks/useBackendStatus';
 import { Logo } from './Sidebar';
 import { ThemeSwitch } from './ThemeSwitch';
+import { BackendPill } from './BackendStatus';
 
 interface Props {
   title: string;
   subtitle: string;
-  online: boolean | null;
+  backend: BackendStatus;
   mock: boolean;
   theme: Theme;
   onTheme: (t: Theme, origin: { x: number; y: number }) => void;
@@ -13,9 +15,7 @@ interface Props {
 
 const today = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
 
-export function Header({ title, subtitle, online, mock, theme, onTheme }: Props) {
-  const label = mock ? 'Modo demo' : online === null ? 'Conectando…' : online ? 'Backend conectado' : 'Backend sin conexión';
-  const tone = mock ? 'demo' : online === null ? 'wait' : online ? 'ok' : 'err';
+export function Header({ title, subtitle, backend, mock, theme, onTheme }: Props) {
   return (
     <header className="topbar">
       <div className="topbar-mobile-logo"><Logo /></div>
@@ -25,10 +25,7 @@ export function Header({ title, subtitle, online, mock, theme, onTheme }: Props)
         <p>{subtitle}</p>
       </div>
       <div className="topbar-actions">
-        <span className={`conn conn-${tone}`} title={label}>
-          <i />
-          <span className="conn-label">{label}</span>
-        </span>
+        <BackendPill status={backend} mock={mock} />
         <ThemeSwitch theme={theme} onChange={onTheme} />
       </div>
     </header>

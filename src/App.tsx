@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { api, USE_MOCK } from './api/client';
+import { USE_MOCK } from './api/client';
 import type { FileItem } from './api/types';
 import { useFiles } from './hooks/useFiles';
 import { useUploads } from './hooks/useUploads';
 import { useTheme } from './hooks/useTheme';
+import { useBackendStatus } from './hooks/useBackendStatus';
+import { OfflineBanner } from './components/BackendStatus';
 import { Sidebar, type View } from './components/Sidebar';
 import { Header } from './components/Header';
 import { Dropzone } from './components/Dropzone';
@@ -23,12 +25,12 @@ const titles: Record<View, [string, string]> = {
 export default function App() {
   const [view, setView] = useState<View>('dashboard');
   const [openId, setOpenId] = useState<string | null>(null);
-  const [online, setOnline] = useState<boolean | null>(null);
-  const [version, setVersion] = useState<string>();
   const [toasts, setToasts] = useState<Toast[]>([]);
   const { theme, setTheme } = useTheme();
+  const backend = useBackendStatus();
   const { files, loading, error, refresh, remove, reprocess } = useFiles();
   const uploads = useUploads(refresh);
+  const uploading = uploads.tasks.filter((t) => t.state === 'uploading').length;
 
   const toast = useCallback((text: string, tone: Toast['tone'] = 'ok') => {
     const id = crypto.randomUUID();
@@ -36,23 +38,11 @@ export default function App() {
     setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 3200);
   }, []);
 
+  // Si falla la carga de archivos, comprobar al momento si la API sigue en pie
+  const { check } = backend;
   useEffect(() => {
-    const check = () =>
-      api.health().then(
-        (h) => {
-          setOnline(h.status === 'ok');
-          setVersion(h.version);
-        },
-        () => setOnline(false),
-      );
-    check();
-    const t = setInterval(check, 15000);
-    return () => clearInterval(t);
-  }, []);
-
-  useEffect(() => {
-    if (error) setOnline(false);
-  }, [error]);
+    if (error) void check();
+  }, [error, check]);
 
   // Mantener el detalle sincronizado con el sondeo
   const openFile = useMemo(() => files.find((f) => f.id === openId) ?? null, [files, openId]);
@@ -88,20 +78,22 @@ export default function App() {
     <div className="app">
       <Sidebar view={view} onChange={setView} />
       <main className="main">
-        <Header title={title} subtitle={subtitle} online={online} mock={USE_MOCK} theme={theme} onTheme={setTheme} />
+        <Header title={title} subtitle={subtitle} backend={backend} mock={USE_MOCK} theme={theme} onTheme={setTheme} />
 
         <div className="content" key={view}>
+          {!USE_MOCK && <OfflineBanner status={backend} />}
           {view === 'dashboard' && (
             <div className="dash">
               <StatCards files={files} />
               <div className="dash-upload">
-                <Dropzone onFiles={handleFiles} maxMb={uploads.maxMb} />
+                <Dropzone onFiles={handleFiles} maxMb={uploads.maxMb} uploading={uploading} />
                 <UploadQueue tasks={uploads.tasks} onCancel={uploads.cancel} onClear={uploads.clearFinished} />
               </div>
               <FileList
                 title="Recientes"
                 files={files}
                 loading={loading}
+                error={error}
                 limit={6}
                 onOpen={open}
                 onRefresh={refresh}
@@ -111,10 +103,10 @@ export default function App() {
           )}
 
           {view === 'files' && (
-            <FileList files={files} loading={loading} onOpen={open} onRefresh={refresh} />
+            <FileList files={files} loading={loading} error={error} onOpen={open} onRefresh={refresh} />
           )}
 
-          {view === 'connection' && <Connection online={online} mock={USE_MOCK} version={version} />}
+          {view === 'connection' && <Connection backend={backend} mock={USE_MOCK} />}
         </div>
       </main>
 

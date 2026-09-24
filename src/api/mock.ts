@@ -120,11 +120,8 @@ async function process(id: string) {
 
 seed();
 
+// El estado de la API no se simula: pingBackend (client.ts) consulta siempre la API real
 export const mockApi: Api = {
-  async health() {
-    await sleep(150);
-    return { status: 'ok', version: 'mock' };
-  },
   async listFiles() {
     await sleep(200);
     return [...store.values()].map((e) => e.item)

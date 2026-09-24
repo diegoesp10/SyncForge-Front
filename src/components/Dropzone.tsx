@@ -1,14 +1,17 @@
 import { useRef, useState, type DragEvent } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { Composition } from './Composition';
+import { Loader } from './Loader';
 import { SUPPORTED_EXTENSIONS } from '../utils/format';
 
 interface Props {
   onFiles: (files: File[]) => void;
   maxMb: number;
+  /** Subidas en curso: el botón muestra el loader mientras haya alguna */
+  uploading?: number;
 }
 
-export function Dropzone({ onFiles, maxMb }: Props) {
+export function Dropzone({ onFiles, maxMb, uploading = 0 }: Props) {
   const [over, setOver] = useState(false);
   const input = useRef<HTMLInputElement>(null);
   const depth = useRef(0);
@@ -23,7 +26,7 @@ export function Dropzone({ onFiles, maxMb }: Props) {
 
   return (
     <div
-      className={`dropzone ${over ? 'is-over' : ''}`}
+      className={`dropzone ${over ? 'is-over' : ''} ${uploading ? 'is-uploading' : ''}`}
       role="button"
       tabIndex={0}
       aria-label="Subir archivos"
@@ -49,7 +52,15 @@ export function Dropzone({ onFiles, maxMb }: Props) {
           </p>
           <p className="dz-hint">{SUPPORTED_EXTENSIONS.join(', ').toUpperCase()} · hasta {maxMb} MB por archivo</p>
           <span className="btn-primary dz-btn" aria-hidden>
-            <ArrowUp size={16} /> Seleccionar archivos
+            {uploading ? (
+              <>
+                <Loader size="sm" label="Subiendo" /> Subiendo {uploading} {uploading === 1 ? 'archivo' : 'archivos'}…
+              </>
+            ) : (
+              <>
+                <ArrowUp size={16} /> Seleccionar archivos
+              </>
+            )}
           </span>
         </div>
         <Composition preset="upload" className="dz-art" />

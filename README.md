@@ -22,6 +22,8 @@ Aplicación web para **subir archivos** y seguir cómo los procesa el backend de
 - Panel con métricas y listado con búsqueda y filtros por estado.
 - Panel lateral de detalle: estado, resumen y vista previa del resultado (tabla, JSON o texto).
 - Actualización automática: cada 1 s mientras hay archivos en cola o procesándose, cada 8 s si no.
+- Estado de la API a la vista: indicador en la cabecera (con latencia), aviso si deja de responder y panel en **Conexión** con el historial de comprobaciones. Se comprueba cada 15 s y al pulsar el indicador.
+- Indicadores de carga en cada acción que espera a la API (actualizar, reprocesar, eliminar, descargar, subir).
 - Modo día (por defecto) y modo noche a elección del usuario. Diseño fluido: ocupa toda la pantalla en monitores anchos; en tablet la barra lateral se compacta y en móvil pasa a una barra inferior con la tabla en tarjetas.
 - **Modo demo:** funciona sin backend, con datos simulados en el navegador.
 
@@ -142,8 +144,8 @@ Instala las dependencias en la misma plataforma donde vas a ejecutar el proyecto
 ```
 src/
   api/          types.ts (DTOs) · client.ts (fetch/XHR) · mock.ts (backend simulado)
-  hooks/        useFiles (listado + sondeo) · useUploads (cola de subida) · useTheme
-  components/   Sidebar, Header, StatCards, Dropzone, UploadQueue, FileList, FileDetail, FilePreview…
+  hooks/        useFiles (listado + sondeo) · useUploads (cola de subida) · useBackendStatus (salud de la API) · useTheme
+  components/   Sidebar, Header, StatCards, Dropzone, UploadQueue, FileList, FileDetail, FilePreview, BackendStatus, Loader, AsyncButton…
   styles/       index.css (tokens de diseño + responsive)
   utils/        format.ts (tamaños, fechas relativas, tipo de archivo)
 ```

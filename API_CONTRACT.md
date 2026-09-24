@@ -19,6 +19,8 @@ Contrato verificado contra el backend de SyncForge (`API/Controllers/FilesContro
 | POST | `/api/files/{id}/reprocess` | `FileItem` |
 | DELETE | `/api/files/{id}` | `204` |
 
+El frontal consulta `/api/health` cada 15 s y bajo demanda, **también en modo demo**, para mostrar si la API está levantada: `200` + `status: "ok"` → en línea · `503` → con fallos · sin respuesta, `502`/`504` del proxy o más de 4 s → caída.
+
 Códigos de error: `400` petición no válida · `404` archivo no encontrado · `409` conflicto de estado · `413` archivo demasiado grande.
 
 ## Formatos y límites
