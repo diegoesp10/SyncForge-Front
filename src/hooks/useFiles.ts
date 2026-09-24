@@ -21,7 +21,7 @@ export function useFiles() {
       busy = list.some((f) => f.status === 'Pending' || f.status === 'Processing');
     } catch (e) {
       if (!alive.current) return;
-      setError(e instanceof Error ? e.message : 'Error al cargar archivos');
+      setError(e instanceof Error ? e.message : String(e));
     } finally {
       setLoading(false);
     }

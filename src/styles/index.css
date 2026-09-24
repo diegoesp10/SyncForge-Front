@@ -324,6 +324,10 @@ button.conn:hover { border-color: var(--border-strong); color: var(--text); }
   transition: transform 0.45s var(--ease);
 }
 .theme-switch[data-value='night'] .theme-thumb { transform: translateX(100%); }
+/* Selector de idioma: misma pieza que el de día/noche, con el código del idioma */
+.lang-switch[data-value='en'] .theme-thumb { transform: translateX(100%); }
+.lang-switch button { padding: 0 12px; }
+.lang-switch b { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.06em; }
 
 /* ============ Controls ============ */
 .icon-btn {
@@ -1016,7 +1020,8 @@ button.conn:hover { border-color: var(--border-strong); color: var(--text); }
   .topbar-title h1 { font-size: clamp(44px, 12vw, 60px); }
   .conn-label, .conn-ms, .theme-switch span { display: none; }
   .conn { width: 40px; padding: 0; }
-  .theme-switch button { padding: 0 12px; }
+  .theme-switch button { padding: 0 11px; }
+  .topbar-actions { gap: 6px; }
 
   .search { width: auto; flex: 1; }
   .fl-tools { width: 100%; margin-left: 0; }
@@ -1056,6 +1061,9 @@ button.conn:hover { border-color: var(--border-strong); color: var(--text); }
   .stat { padding: 16px; }
   .stat-value { font-size: 42px; }
   .stat-label { font-size: 10px; letter-spacing: 0.12em; }
+  /* Con estado, idioma y modo en la cabecera, el logo se queda solo con el símbolo */
+  .topbar-mobile-logo .logo span { display: none; }
+  .theme-switch button { padding: 0 9px; }
   .card { padding: 16px; }
   .drawer-foot button { font-size: 13px; gap: 6px; padding: 0 8px; }
   .drawer-foot .btn-ghost.danger > span { display: none; }

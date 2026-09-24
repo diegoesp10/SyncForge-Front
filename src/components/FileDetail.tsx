@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { X, RotateCw, Trash2, Download, AlertTriangle } from 'lucide-react';
 import { api } from '../api/client';
 import type { FileItem, FileResult } from '../api/types';
+import { useI18n } from '../i18n';
 import { FileIcon } from './FileIcon';
 import { AsyncButton } from './AsyncButton';
 import { Loader, LoadingState } from './Loader';
@@ -16,15 +17,8 @@ interface Props {
   onReprocess: (id: string) => Promise<void>;
 }
 
-const summaryLabels: Record<string, string> = {
-  rows: 'Filas',
-  columns: 'Columnas',
-  lines: 'Líneas',
-  encoding: 'Codificación',
-  durationMs: 'Tiempo',
-};
-
 export function FileDetail({ file: current, onClose, onDelete, onReprocess }: Props) {
+  const { t, has, lang, locale } = useI18n();
   // Conserva el último archivo mientras el panel se cierra para que la animación no quede vacía
   const [last, setLast] = useState<FileItem | null>(current);
   useEffect(() => {
@@ -37,6 +31,7 @@ export function FileDetail({ file: current, onClose, onDelete, onReprocess }: Pr
   const [err, setErr] = useState<string | null>(null);
   const status = file?.status;
 
+  // También se vuelve a pedir al cambiar de idioma: los avisos del resultado los traduce la API
   useEffect(() => {
     setResult(null);
     setErr(null);
@@ -51,7 +46,7 @@ export function FileDetail({ file: current, onClose, onDelete, onReprocess }: Pr
     return () => {
       alive = false;
     };
-  }, [file?.id, status]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [file?.id, status, lang]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -72,9 +67,12 @@ export function FileDetail({ file: current, onClose, onDelete, onReprocess }: Pr
       a.click();
       URL.revokeObjectURL(a.href);
     } catch (e) {
-      setErr(e instanceof Error ? e.message : 'No se pudo descargar el resultado');
+      setErr(e instanceof Error ? e.message : t('detail.downloadFailed'));
     }
   };
+
+  const formats = SUPPORTED_EXTENSIONS.map((e) => `.${e}`).join(', ');
+  const supported = file ? SUPPORTED_EXTENSIONS.includes(extOf(file.fileName)) : false;
 
   return (
     <>
@@ -88,17 +86,17 @@ export function FileDetail({ file: current, onClose, onDelete, onReprocess }: Pr
                 <span className="eyebrow mono">{file.contentType}</span>
                 <h2 title={file.fileName}>{file.fileName}</h2>
               </div>
-              <button className="icon-btn" onClick={onClose} aria-label="Cerrar">
+              <button className="icon-btn" onClick={onClose} aria-label={t('detail.close')}>
                 <X size={18} />
               </button>
             </header>
 
             <div className="drawer-body">
               <div className="meta-grid">
-                <div><span>Estado</span><StatusBadge status={file.status} progress={file.progress} /></div>
-                <div><span>Tamaño</span><b className="mono">{formatBytes(file.size)}</b></div>
-                <div><span>Subido</span><b>{formatDate(file.uploadedAt)}</b></div>
-                <div><span>Procesado</span><b>{formatDate(file.processedAt)}</b></div>
+                <div><span>{t('detail.status')}</span><StatusBadge status={file.status} progress={file.progress} /></div>
+                <div><span>{t('detail.size')}</span><b className="mono">{formatBytes(file.size)}</b></div>
+                <div><span>{t('detail.uploaded')}</span><b>{formatDate(file.uploadedAt, locale)}</b></div>
+                <div><span>{t('detail.processed')}</span><b>{formatDate(file.processedAt, locale)}</b></div>
               </div>
 
               {file.status === 'Processing' && (
@@ -111,13 +109,11 @@ export function FileDetail({ file: current, onClose, onDelete, onReprocess }: Pr
                 <div className="failure" role="alert">
                   <span className="failure-mark" aria-hidden />
                   <div>
-                    <span className="eyebrow">Respuesta de la API</span>
-                    <p className="failure-title">No se pudo procesar<span className="h1-dot">.</span></p>
-                    <p className="failure-reason">{file.error ?? 'La API no pudo procesar el archivo.'}</p>
+                    <span className="eyebrow">{t('detail.failureEyebrow')}</span>
+                    <p className="failure-title">{t('detail.failureTitle')}<span className="h1-dot">.</span></p>
+                    <p className="failure-reason">{file.error ?? t('detail.failureFallback')}</p>
                     <p className="failure-hint">
-                      {SUPPORTED_EXTENSIONS.includes(extOf(file.fileName))
-                        ? 'Revisa el contenido del archivo (separadores, codificación UTF-8, JSON válido). Si lo corriges, súbelo de nuevo; si crees que es un fallo puntual, pulsa Reprocesar.'
-                        : `Este formato no se puede procesar. Conviértelo a uno de estos y súbelo de nuevo: ${SUPPORTED_EXTENSIONS.map((e) => `.${e}`).join(', ')}.`}
+                      {supported ? t('detail.failureHintContent') : t('detail.failureHintFormat', { formats })}
                     </p>
                   </div>
                 </div>
@@ -125,49 +121,57 @@ export function FileDetail({ file: current, onClose, onDelete, onReprocess }: Pr
 
               {(file.status === 'Pending' || file.status === 'Processing') && (
                 <div className="waiting">
-                  <Loader label="Procesando" />
-                  <p>El backend está leyendo el archivo. El resultado aparecerá aquí automáticamente.</p>
+                  <Loader label={t('detail.processingAria')} />
+                  <p>{t('detail.processing')}</p>
                 </div>
               )}
 
-              {loading && <LoadingState label="Leyendo el resultado…" />}
+              {loading && <LoadingState label={t('detail.loadingResult')} />}
               {err && <div className="alert err"><AlertTriangle size={16} /><span>{err}</span></div>}
 
               {result && (
                 <>
                   <div className="summary">
-                    {Object.entries(result.summary).map(([k, v]) =>
-                      v === undefined ? null : (
+                    {Object.entries(result.summary).map(([k, v]) => {
+                      if (v === undefined || v === null) return null;
+                      const labelKey = `detail.summary.${k}`;
+                      return (
                         <div key={k} className="summary-item">
-                          <span>{summaryLabels[k] ?? k}</span>
+                          <span>{has(labelKey) ? t(labelKey) : k}</span>
                           <b className="mono">
-                            {k === 'durationMs' ? `${Number(v).toLocaleString('es-ES')} ms` : typeof v === 'number' ? v.toLocaleString('es-ES') : v}
+                            {k === 'durationMs' ? `${Number(v).toLocaleString(locale)} ms` : typeof v === 'number' ? v.toLocaleString(locale) : v}
                           </b>
                         </div>
-                      ),
-                    )}
+                      );
+                    })}
                   </div>
                   {result.warnings?.map((w, i) => (
                     <div key={i} className="alert warn"><AlertTriangle size={16} /><span>{w}</span></div>
                   ))}
-                  <h4 className="section-title">Vista previa</h4>
+                  <h4 className="section-title">{t('detail.preview')}</h4>
                   <FilePreview preview={result.preview} />
                 </>
               )}
             </div>
 
             <footer className="drawer-foot">
-              <AsyncButton className="btn-ghost danger" icon={<Trash2 size={16} />} busyLabel="Eliminando…" aria-label="Eliminar archivo" onClick={() => onDelete(file.id).then(onClose)}>
-                Eliminar
+              <AsyncButton
+                className="btn-ghost danger"
+                icon={<Trash2 size={16} />}
+                busyLabel={t('detail.deleting')}
+                aria-label={t('detail.deleteAria')}
+                onClick={() => onDelete(file.id).then(onClose)}
+              >
+                {t('detail.delete')}
               </AsyncButton>
               <div className="spacer" />
-              {(file.status === 'Failed' || file.status === 'Completed') && SUPPORTED_EXTENSIONS.includes(extOf(file.fileName)) && (
-                <AsyncButton className="btn-ghost" icon={<RotateCw size={16} />} busyLabel="Enviando…" onClick={() => onReprocess(file.id)}>
-                  Reprocesar
+              {(file.status === 'Failed' || file.status === 'Completed') && supported && (
+                <AsyncButton className="btn-ghost" icon={<RotateCw size={16} />} busyLabel={t('detail.reprocessing')} onClick={() => onReprocess(file.id)}>
+                  {t('detail.reprocess')}
                 </AsyncButton>
               )}
-              <AsyncButton className="btn-primary" icon={<Download size={16} />} busyLabel="Descargando…" disabled={!result} onClick={download}>
-                Resultado
+              <AsyncButton className="btn-primary" icon={<Download size={16} />} busyLabel={t('detail.downloading')} disabled={!result} onClick={download}>
+                {t('detail.result')}
               </AsyncButton>
             </footer>
           </>

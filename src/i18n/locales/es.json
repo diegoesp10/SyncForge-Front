@@ -1,0 +1,231 @@
+{
+  "meta": {
+    "name": "Español",
+    "short": "ES"
+  },
+  "app": {
+    "dashboard": { "title": "Panel", "subtitle": "Sube archivos y deja que el backend haga el resto" },
+    "files": { "title": "Archivos", "subtitle": "Todo lo que has subido y su estado de procesado" },
+    "connection": { "title": "Conexión", "subtitle": "Estado de la API y contrato de endpoints" }
+  },
+  "nav": {
+    "aria": "Principal",
+    "dashboard": "Panel",
+    "files": "Archivos",
+    "connection": "Conexión",
+    "artLine1": "Sube, procesa",
+    "artLine2": "y revisa.",
+    "version": "v0.1 · frontal"
+  },
+  "theme": {
+    "aria": "Modo de color",
+    "day": "Día",
+    "night": "Noche",
+    "dayTitle": "Modo día",
+    "nightTitle": "Modo noche"
+  },
+  "language": {
+    "aria": "Idioma de la interfaz",
+    "switchTo": "Cambiar el idioma a {language}"
+  },
+  "backend": {
+    "states": {
+      "checking": { "short": "Comprobando…", "title": "Comprobando", "desc": "Llamando a /api/health…" },
+      "online": { "short": "API en línea", "title": "En línea", "desc": "La API responde con normalidad." },
+      "degraded": {
+        "short": "API con fallos",
+        "title": "Con fallos",
+        "desc": "La API responde, pero su comprobación de salud indica un problema (503)."
+      },
+      "offline": {
+        "short": "API caída",
+        "title": "Caída",
+        "desc": "La API no responde. Comprueba que está levantada y que VITE_BACKEND_URL apunta a ella."
+      }
+    },
+    "pillTitle": "{status} · pulsa para comprobar ahora",
+    "pillAria": "{status}. Pulsa para comprobar el estado de la API",
+    "cardTitle": "Backend",
+    "eyebrow": "Estado de la API",
+    "latency": "Latencia",
+    "version": "Versión",
+    "checked": "Comprobado",
+    "interval": "Intervalo",
+    "every": "cada {seconds} s",
+    "justNow": "ahora mismo",
+    "history": "Últimas comprobaciones",
+    "historyAria": "Últimas {count} comprobaciones",
+    "now": "ahora",
+    "checkNow": "Comprobar ahora",
+    "checking": "Comprobando…",
+    "bannerOffline": "La API no responde.",
+    "bannerDegraded": "La API tiene problemas.",
+    "bannerRetry": "Se vuelve a comprobar cada {seconds} s.",
+    "retry": "Reintentar"
+  },
+  "connection": {
+    "endpoints": "Endpoints",
+    "health": "Estado del backend",
+    "upload": "Subida multipart (campo \"file\")",
+    "list": "Listado de archivos",
+    "detail": "Detalle y estado",
+    "result": "Resultado del procesado",
+    "reprocess": "Volver a procesar",
+    "delete": "Eliminar archivo"
+  },
+  "stats": {
+    "files": "Archivos",
+    "processing": "En proceso",
+    "working": "trabajando…",
+    "idle": "sin cola",
+    "completed": "Completados",
+    "ofTotal": "{percent}% del total",
+    "failed": "Con error",
+    "review": "revisar",
+    "allGood": "todo en orden"
+  },
+  "dropzone": {
+    "aria": "Subir archivos",
+    "eyebrow": "Nueva subida",
+    "eyebrowRejected": "Subida rechazada",
+    "title": "Arrastra tus archivos",
+    "titleEm": "o selecciónalos.",
+    "overTitle": "Suéltalos",
+    "overEm": "aquí mismo.",
+    "rejectedSingle": "Archivo",
+    "rejectedOneOfMany": "Un archivo",
+    "rejectedAll": "Archivos",
+    "rejectedSome": "Algunos archivos",
+    "notAllowedOne": "no admitido.",
+    "notAllowedMany": "no admitidos.",
+    "hint": "{formats} · hasta {max} MB por archivo",
+    "rejectedHint": {
+      "one": "{rejected} de {count} archivo no cumple los requisitos. Revisa el motivo en Subidas.",
+      "other": "{rejected} de {count} archivos no cumplen los requisitos. Revisa el motivo en Subidas."
+    },
+    "select": "Seleccionar archivos",
+    "uploading": { "one": "Subiendo {count} archivo…", "other": "Subiendo {count} archivos…" },
+    "uploadingAria": "Subiendo"
+  },
+  "uploads": {
+    "title": "Subidas",
+    "rejectedChip": { "one": "{count} rechazado", "other": "{count} rechazados" },
+    "clear": "Limpiar",
+    "uploaded": "Subido",
+    "cancel": "Cancelar",
+    "cancelAria": "Cancelar {name}",
+    "remove": "Quitar",
+    "removeAria": "Quitar {name}",
+    "originClient": "Frontal · {reason}",
+    "originApi": "API · {status}",
+    "originOffline": "Sin conexión",
+    "reasons": {
+      "format": "Formato",
+      "empty": "Vacío",
+      "size": "Tamaño",
+      "name": "Nombre",
+      "binary": "Contenido"
+    },
+    "hint": "Se admiten {formats} de texto, hasta {max} MB.",
+    "cancelled": "Subida cancelada"
+  },
+  "reject": {
+    "format": "Formato no admitido: .{ext}",
+    "noExtension": "El archivo no tiene extensión",
+    "empty": "El archivo está vacío",
+    "size": "Supera el máximo de {max} MB",
+    "name": "Nombre de archivo no válido: contiene caracteres no permitidos o es demasiado largo",
+    "binary": "El contenido no es texto: parece {kind} con extensión .{ext}",
+    "kinds": {
+      "pdf": "un PDF",
+      "zip": "un ZIP, XLSX o DOCX",
+      "exe": "un ejecutable de Windows",
+      "elf": "un ejecutable",
+      "png": "una imagen PNG",
+      "jpeg": "una imagen JPEG",
+      "gif": "una imagen GIF",
+      "gzip": "un archivo comprimido GZIP",
+      "rar": "un archivo RAR",
+      "binary": "un archivo binario"
+    }
+  },
+  "files": {
+    "title": "Archivos",
+    "recent": "Recientes",
+    "search": "Buscar archivo…",
+    "refresh": "Actualizar",
+    "seeAll": "Ver todos",
+    "all": "Todos",
+    "loading": "Cargando archivos…",
+    "loadFailed": "No se pudo cargar la lista",
+    "retry": "Reintentar",
+    "retrying": "Cargando…",
+    "noMatch": "Nada coincide con el filtro",
+    "noMatchHint": "Prueba con otra búsqueda o estado.",
+    "empty": "Aún no hay archivos",
+    "emptyHint": "Los que subas aparecerán aquí.",
+    "columns": {
+      "name": "Nombre",
+      "type": "Tipo",
+      "size": "Tamaño",
+      "uploaded": "Subido",
+      "status": "Estado"
+    }
+  },
+  "status": {
+    "Pending": "En cola",
+    "Processing": "Procesando",
+    "Completed": "Completado",
+    "Failed": "Error"
+  },
+  "detail": {
+    "close": "Cerrar",
+    "status": "Estado",
+    "size": "Tamaño",
+    "uploaded": "Subido",
+    "processed": "Procesado",
+    "failureEyebrow": "Respuesta de la API",
+    "failureTitle": "No se pudo procesar",
+    "failureFallback": "La API no pudo procesar el archivo.",
+    "failureHintContent": "Revisa el contenido del archivo (separadores, codificación UTF-8, JSON válido). Si lo corriges, súbelo de nuevo; si crees que es un fallo puntual, pulsa Reprocesar.",
+    "failureHintFormat": "Este formato no se puede procesar. Conviértelo a uno de estos y súbelo de nuevo: {formats}.",
+    "processingAria": "Procesando",
+    "processing": "El backend está leyendo el archivo. El resultado aparecerá aquí automáticamente.",
+    "loadingResult": "Leyendo el resultado…",
+    "preview": "Vista previa",
+    "delete": "Eliminar",
+    "deleteAria": "Eliminar archivo",
+    "deleting": "Eliminando…",
+    "reprocess": "Reprocesar",
+    "reprocessing": "Enviando…",
+    "result": "Resultado",
+    "downloading": "Descargando…",
+    "downloadFailed": "No se pudo descargar el resultado",
+    "summary": {
+      "rows": "Filas",
+      "columns": "Columnas",
+      "lines": "Líneas",
+      "encoding": "Codificación",
+      "durationMs": "Tiempo"
+    }
+  },
+  "errors": {
+    "unreachable": "No se pudo conectar con la API. Comprueba que está levantada.",
+    "400": "La API ha rechazado la petición por no ser válida.",
+    "404": "El archivo ya no existe en la API.",
+    "409": "La operación no es posible en el estado actual del archivo.",
+    "413": "El archivo supera el tamaño máximo que admite la API.",
+    "415": "La API no admite este tipo de contenido.",
+    "generic": "Error {status}"
+  },
+  "toasts": {
+    "uploading": { "one": "Subiendo {count} archivo", "other": "Subiendo {count} archivos" },
+    "rejected": { "one": "{count} archivo no admitido", "other": "{count} archivos no admitidos" },
+    "deleted": "Archivo eliminado",
+    "reprocessQueued": "Enviado a reprocesar",
+    "language": "Idioma: español"
+  },
+  "loader": {
+    "default": "Cargando"
+  }
+}

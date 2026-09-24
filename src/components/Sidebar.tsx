@@ -1,12 +1,13 @@
 import { LayoutDashboard, FolderOpen, PlugZap } from 'lucide-react';
+import { useI18n } from '../i18n';
 import { Composition } from './Composition';
 
 export type View = 'dashboard' | 'files' | 'connection';
 
-const items: { id: View; label: string; Icon: typeof LayoutDashboard }[] = [
-  { id: 'dashboard', label: 'Panel', Icon: LayoutDashboard },
-  { id: 'files', label: 'Archivos', Icon: FolderOpen },
-  { id: 'connection', label: 'Conexión', Icon: PlugZap },
+const items: { id: View; Icon: typeof LayoutDashboard }[] = [
+  { id: 'dashboard', Icon: LayoutDashboard },
+  { id: 'files', Icon: FolderOpen },
+  { id: 'connection', Icon: PlugZap },
 ];
 
 export function Logo() {
@@ -19,20 +20,21 @@ export function Logo() {
 }
 
 export function Sidebar({ view, onChange }: { view: View; onChange: (v: View) => void }) {
+  const { t } = useI18n();
   return (
-    <nav className="sidebar" aria-label="Principal">
+    <nav className="sidebar" aria-label={t('nav.aria')}>
       <Logo />
       <ul>
-        {items.map(({ id, label, Icon }, i) => (
+        {items.map(({ id, Icon }, i) => (
           <li key={id}>
             <button
               className={view === id ? 'active' : ''}
               aria-current={view === id ? 'page' : undefined}
-              title={label}
+              title={t(`nav.${id}`)}
               onClick={() => onChange(id)}
             >
               <Icon size={18} strokeWidth={1.6} />
-              <span className="nav-label">{label}</span>
+              <span className="nav-label">{t(`nav.${id}`)}</span>
               <span className="nav-num">0{i + 1}</span>
             </button>
           </li>
@@ -41,9 +43,9 @@ export function Sidebar({ view, onChange }: { view: View; onChange: (v: View) =>
       <div className="sidebar-foot">
         <div className="sidebar-art">
           <Composition preset="sidebar" />
-          <p>Sube, procesa<br /><em>y revisa.</em></p>
+          <p>{t('nav.artLine1')}<br /><em>{t('nav.artLine2')}</em></p>
         </div>
-        <span>v0.1 · frontal</span>
+        <span>{t('nav.version')}</span>
       </div>
     </nav>
   );

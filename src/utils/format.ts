@@ -10,20 +10,26 @@ export function formatBytes(bytes: number): string {
   return `${v.toFixed(v < 10 ? 1 : 0)} ${units[i]}`;
 }
 
-const rtf = new Intl.RelativeTimeFormat('es', { numeric: 'auto' });
-
-export function timeAgo(iso: string): string {
-  const diff = (new Date(iso).getTime() - Date.now()) / 1000;
-  const abs = Math.abs(diff);
-  if (abs < 45) return 'ahora mismo';
-  if (abs < 3600) return rtf.format(Math.round(diff / 60), 'minute');
-  if (abs < 86400) return rtf.format(Math.round(diff / 3600), 'hour');
-  return rtf.format(Math.round(diff / 86400), 'day');
+// Un formateador por idioma ("hace 5 minutos" / "5 minutes ago")
+const relative = new Map<string, Intl.RelativeTimeFormat>();
+function rtf(locale: string) {
+  let f = relative.get(locale);
+  if (!f) relative.set(locale, (f = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })));
+  return f;
 }
 
-export function formatDate(iso?: string | null): string {
+export function timeAgo(iso: string | number, locale: string): string {
+  const diff = (new Date(iso).getTime() - Date.now()) / 1000;
+  const abs = Math.abs(diff);
+  if (abs < 45) return rtf(locale).format(0, 'second');
+  if (abs < 3600) return rtf(locale).format(Math.round(diff / 60), 'minute');
+  if (abs < 86400) return rtf(locale).format(Math.round(diff / 3600), 'hour');
+  return rtf(locale).format(Math.round(diff / 86400), 'day');
+}
+
+export function formatDate(iso: string | null | undefined, locale: string): string {
   if (!iso) return '—';
-  return new Date(iso).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' });
+  return new Date(iso).toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' });
 }
 
 export function extOf(name: string): string {

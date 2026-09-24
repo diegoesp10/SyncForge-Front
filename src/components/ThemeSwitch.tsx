@@ -1,9 +1,10 @@
 import { Moon, Sun } from 'lucide-react';
 import type { Theme } from '../hooks/useTheme';
+import { useI18n } from '../i18n';
 
 const options = [
-  { id: 'day', label: 'Día', Icon: Sun },
-  { id: 'night', label: 'Noche', Icon: Moon },
+  { id: 'day', Icon: Sun },
+  { id: 'night', Icon: Moon },
 ] as const;
 
 interface Props {
@@ -12,16 +13,17 @@ interface Props {
 }
 
 export function ThemeSwitch({ theme, onChange }: Props) {
+  const { t } = useI18n();
   return (
-    <div className="theme-switch" role="radiogroup" aria-label="Modo de color" data-value={theme}>
+    <div className="theme-switch" role="radiogroup" aria-label={t('theme.aria')} data-value={theme}>
       <i className="theme-thumb" aria-hidden />
-      {options.map(({ id, label, Icon }) => (
+      {options.map(({ id, Icon }) => (
         <button
           key={id}
           role="radio"
           aria-checked={theme === id}
           className={theme === id ? 'active' : ''}
-          title={`Modo ${label.toLowerCase()}`}
+          title={t(`theme.${id}Title`)}
           onClick={(e) => {
             if (theme === id) return;
             const r = e.currentTarget.getBoundingClientRect();
@@ -29,7 +31,7 @@ export function ThemeSwitch({ theme, onChange }: Props) {
           }}
         >
           <Icon size={15} strokeWidth={1.8} />
-          <span>{label}</span>
+          <span>{t(`theme.${id}`)}</span>
         </button>
       ))}
     </div>

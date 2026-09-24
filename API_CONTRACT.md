@@ -4,7 +4,7 @@ Contrato verificado contra el backend de SyncForge (`API/Controllers/FilesContro
 
 - **Base:** `/api`. En desarrollo, Vite reenvía `/api` a `VITE_BACKEND_URL` (por defecto `http://localhost:5254`).
 - **JSON:** camelCase.
-- **Idioma:** la API traduce errores y avisos según `?language=es|en` o la cabecera `Accept-Language`. El frontal envía `Accept-Language: es`.
+- **Idioma:** la API traduce errores y avisos según `?language=es|en` o la cabecera `Accept-Language`. El frontal envía `Accept-Language` con el idioma elegido por el usuario (`es` o `en`) y, al cambiarlo, vuelve a pedir los datos.
 - **Errores:** `ProblemDetails` (`application/problem+json`); el frontal muestra `detail` o, si no hay, `title`.
 
 ## Endpoints

@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
 import { Search, RefreshCw, ChevronRight } from 'lucide-react';
 import type { FileItem, FileStatus } from '../api/types';
+import { useI18n } from '../i18n';
 import { FileIcon } from './FileIcon';
 import { Composition } from './Composition';
 import { AsyncButton } from './AsyncButton';
 import { LoadingState } from './Loader';
-import { StatusBadge, statusLabels } from './StatusBadge';
+import { StatusBadge } from './StatusBadge';
 import { formatBytes, timeAgo, extOf } from '../utils/format';
 
 interface Props {
@@ -22,7 +23,8 @@ interface Props {
 
 const filters: (FileStatus | 'All')[] = ['All', 'Processing', 'Completed', 'Failed'];
 
-export function FileList({ files, loading, error, title = 'Archivos', limit, onOpen, onRefresh, onSeeAll }: Props) {
+export function FileList({ files, loading, error, title, limit, onOpen, onRefresh, onSeeAll }: Props) {
+  const { t, locale } = useI18n();
   const [q, setQ] = useState('');
   const [status, setStatus] = useState<FileStatus | 'All'>('All');
 
@@ -40,19 +42,19 @@ export function FileList({ files, loading, error, title = 'Archivos', limit, onO
   return (
     <section className="card file-list">
       <div className="card-head wrap">
-        <h3>{title}</h3>
+        <h3>{title ?? t('files.title')}</h3>
         <span className="count">{files.length}</span>
         <div className="fl-tools">
           {!limit && (
             <label className="search">
               <Search size={15} />
-              <input placeholder="Buscar archivo…" value={q} onChange={(e) => setQ(e.target.value)} />
+              <input placeholder={t('files.search')} aria-label={t('files.search')} value={q} onChange={(e) => setQ(e.target.value)} />
             </label>
           )}
-          <AsyncButton className="icon-btn" onClick={onRefresh} icon={<RefreshCw size={15} />} aria-label="Actualizar" title="Actualizar" />
+          <AsyncButton className="icon-btn" onClick={onRefresh} icon={<RefreshCw size={15} />} aria-label={t('files.refresh')} title={t('files.refresh')} />
           {onSeeAll && (
             <button className="btn-ghost sm" onClick={onSeeAll}>
-              Ver todos <ChevronRight size={14} />
+              {t('files.seeAll')} <ChevronRight size={14} />
             </button>
           )}
         </div>
@@ -62,7 +64,7 @@ export function FileList({ files, loading, error, title = 'Archivos', limit, onO
         <div className="chips">
           {filters.map((f) => (
             <button key={f} className={`chip ${status === f ? 'active' : ''}`} onClick={() => setStatus(f)}>
-              {f === 'All' ? 'Todos' : statusLabels[f]}
+              {f === 'All' ? t('files.all') : t(`status.${f}`)}
               <span className="chip-count">
                 {f === 'All' ? files.length : files.filter((x) => x.status === f || (f === 'Processing' && x.status === 'Pending')).length}
               </span>
@@ -72,21 +74,21 @@ export function FileList({ files, loading, error, title = 'Archivos', limit, onO
       )}
 
       {loading ? (
-        <LoadingState label="Cargando archivos…" />
+        <LoadingState label={t('files.loading')} />
       ) : error && files.length === 0 ? (
         <div className="empty is-error">
           <Composition preset="empty" />
-          <p>No se pudo cargar la lista</p>
+          <p>{t('files.loadFailed')}</p>
           <small>{error}</small>
-          <AsyncButton className="btn-ghost sm" icon={<RefreshCw size={14} />} busyLabel="Cargando…" onClick={onRefresh}>
-            Reintentar
+          <AsyncButton className="btn-ghost sm" icon={<RefreshCw size={14} />} busyLabel={t('files.retrying')} onClick={onRefresh}>
+            {t('files.retry')}
           </AsyncButton>
         </div>
       ) : shown.length === 0 ? (
         <div className="empty">
           <Composition preset="empty" />
-          <p>{files.length ? 'Nada coincide con el filtro' : 'Aún no hay archivos'}</p>
-          <small>{files.length ? 'Prueba con otra búsqueda o estado.' : 'Los que subas aparecerán aquí.'}</small>
+          <p>{t(files.length ? 'files.noMatch' : 'files.empty')}</p>
+          <small>{t(files.length ? 'files.noMatchHint' : 'files.emptyHint')}</small>
         </div>
       ) : (
         <>
@@ -94,11 +96,11 @@ export function FileList({ files, loading, error, title = 'Archivos', limit, onO
           <table className="table">
             <thead>
               <tr>
-                <th className="col-name">Nombre</th>
-                <th className="col-type">Tipo</th>
-                <th className="num">Tamaño</th>
-                <th className="col-date">Subido</th>
-                <th>Estado</th>
+                <th className="col-name">{t('files.columns.name')}</th>
+                <th className="col-type">{t('files.columns.type')}</th>
+                <th className="num">{t('files.columns.size')}</th>
+                <th className="col-date">{t('files.columns.uploaded')}</th>
+                <th>{t('files.columns.status')}</th>
               </tr>
             </thead>
             <tbody>
@@ -115,7 +117,7 @@ export function FileList({ files, loading, error, title = 'Archivos', limit, onO
                   </td>
                   <td className="col-type"><span className="ext">{extOf(f.fileName) || '—'}</span></td>
                   <td className="num mono">{formatBytes(f.size)}</td>
-                  <td className="col-date muted">{timeAgo(f.uploadedAt)}</td>
+                  <td className="col-date muted">{timeAgo(f.uploadedAt, locale)}</td>
                   <td><StatusBadge status={f.status} progress={f.progress} /></td>
                 </tr>
               ))}
@@ -132,7 +134,7 @@ export function FileList({ files, loading, error, title = 'Archivos', limit, onO
                     <span className="fc-meta row-error">{f.error}</span>
                   ) : (
                     <span className="fc-meta">
-                      <span className="mono">{formatBytes(f.size)}</span> · {timeAgo(f.uploadedAt)}
+                      <span className="mono">{formatBytes(f.size)}</span> · {timeAgo(f.uploadedAt, locale)}
                     </span>
                   )}
                 </div>

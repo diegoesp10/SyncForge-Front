@@ -24,6 +24,7 @@ Aplicación web para **subir archivos** y seguir cómo los procesa el backend de
 - Panel lateral de detalle: estado, resumen y vista previa del resultado (tabla, JSON o texto).
 - Actualización automática: cada 1 s mientras hay archivos en cola o procesándose, cada 8 s si no.
 - Estado de la API a la vista: indicador en la cabecera (con latencia), aviso si deja de responder y panel en **Conexión** con el historial de comprobaciones. Se comprueba cada 15 s y al pulsar el indicador.
+- Interfaz en **español e inglés**, con selector ES / EN en la cabecera. Los textos están en `src/i18n/locales/es.json` y `en.json`, y el idioma elegido se envía a la API (`Accept-Language`) para que sus mensajes lleguen en el mismo idioma.
 - Indicadores de carga en cada acción que espera a la API (actualizar, reprocesar, eliminar, descargar, subir).
 - Modo día (por defecto) y modo noche a elección del usuario. Diseño fluido: ocupa toda la pantalla en monitores anchos; en tablet la barra lateral se compacta y en móvil pasa a una barra inferior con la tabla en tarjetas.
 
@@ -142,6 +143,7 @@ Instala las dependencias en la misma plataforma donde vas a ejecutar el proyecto
 ```
 src/
   api/          types.ts (DTOs) · client.ts (fetch/XHR y comprobación de salud)
+  i18n/         index.tsx (I18nProvider, useI18n, t) · locales/es.json · locales/en.json
   hooks/        useFiles (listado + sondeo) · useUploads (cola de subida) · useBackendStatus (salud de la API) · useTheme
   components/   Sidebar, Header, StatCards, Dropzone, UploadQueue, FileList, FileDetail, FilePreview, BackendStatus, Loader, AsyncButton…
   styles/       index.css (tokens de diseño + responsive)

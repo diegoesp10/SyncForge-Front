@@ -1,0 +1,231 @@
+{
+  "meta": {
+    "name": "English",
+    "short": "EN"
+  },
+  "app": {
+    "dashboard": { "title": "Dashboard", "subtitle": "Upload files and let the backend do the rest" },
+    "files": { "title": "Files", "subtitle": "Everything you have uploaded and its processing status" },
+    "connection": { "title": "Connection", "subtitle": "API status and endpoint contract" }
+  },
+  "nav": {
+    "aria": "Main",
+    "dashboard": "Dashboard",
+    "files": "Files",
+    "connection": "Connection",
+    "artLine1": "Upload, process",
+    "artLine2": "and review.",
+    "version": "v0.1 · frontend"
+  },
+  "theme": {
+    "aria": "Colour mode",
+    "day": "Day",
+    "night": "Night",
+    "dayTitle": "Day mode",
+    "nightTitle": "Night mode"
+  },
+  "language": {
+    "aria": "Interface language",
+    "switchTo": "Switch language to {language}"
+  },
+  "backend": {
+    "states": {
+      "checking": { "short": "Checking…", "title": "Checking", "desc": "Calling /api/health…" },
+      "online": { "short": "API online", "title": "Online", "desc": "The API is responding normally." },
+      "degraded": {
+        "short": "API degraded",
+        "title": "Degraded",
+        "desc": "The API responds, but its health check reports a problem (503)."
+      },
+      "offline": {
+        "short": "API down",
+        "title": "Down",
+        "desc": "The API is not responding. Make sure it is running and that VITE_BACKEND_URL points to it."
+      }
+    },
+    "pillTitle": "{status} · click to check now",
+    "pillAria": "{status}. Click to check the API status",
+    "cardTitle": "Backend",
+    "eyebrow": "API status",
+    "latency": "Latency",
+    "version": "Version",
+    "checked": "Checked",
+    "interval": "Interval",
+    "every": "every {seconds} s",
+    "justNow": "just now",
+    "history": "Latest checks",
+    "historyAria": "Latest {count} checks",
+    "now": "now",
+    "checkNow": "Check now",
+    "checking": "Checking…",
+    "bannerOffline": "The API is not responding.",
+    "bannerDegraded": "The API is having problems.",
+    "bannerRetry": "Checking again every {seconds} s.",
+    "retry": "Retry"
+  },
+  "connection": {
+    "endpoints": "Endpoints",
+    "health": "Backend status",
+    "upload": "Multipart upload (\"file\" field)",
+    "list": "File list",
+    "detail": "Details and status",
+    "result": "Processing result",
+    "reprocess": "Process again",
+    "delete": "Delete file"
+  },
+  "stats": {
+    "files": "Files",
+    "processing": "Processing",
+    "working": "working…",
+    "idle": "queue empty",
+    "completed": "Completed",
+    "ofTotal": "{percent}% of total",
+    "failed": "Failed",
+    "review": "needs review",
+    "allGood": "all good"
+  },
+  "dropzone": {
+    "aria": "Upload files",
+    "eyebrow": "New upload",
+    "eyebrowRejected": "Upload rejected",
+    "title": "Drag your files here",
+    "titleEm": "or browse for them.",
+    "overTitle": "Drop them",
+    "overEm": "right here.",
+    "rejectedSingle": "File",
+    "rejectedOneOfMany": "One file",
+    "rejectedAll": "Files",
+    "rejectedSome": "Some files",
+    "notAllowedOne": "not allowed.",
+    "notAllowedMany": "not allowed.",
+    "hint": "{formats} · up to {max} MB per file",
+    "rejectedHint": {
+      "one": "{rejected} of {count} file doesn't meet the requirements. See the reason under Uploads.",
+      "other": "{rejected} of {count} files don't meet the requirements. See the reason under Uploads."
+    },
+    "select": "Choose files",
+    "uploading": { "one": "Uploading {count} file…", "other": "Uploading {count} files…" },
+    "uploadingAria": "Uploading"
+  },
+  "uploads": {
+    "title": "Uploads",
+    "rejectedChip": { "one": "{count} rejected", "other": "{count} rejected" },
+    "clear": "Clear",
+    "uploaded": "Uploaded",
+    "cancel": "Cancel",
+    "cancelAria": "Cancel {name}",
+    "remove": "Remove",
+    "removeAria": "Remove {name}",
+    "originClient": "Frontend · {reason}",
+    "originApi": "API · {status}",
+    "originOffline": "No connection",
+    "reasons": {
+      "format": "Format",
+      "empty": "Empty",
+      "size": "Size",
+      "name": "Name",
+      "binary": "Content"
+    },
+    "hint": "Accepted text formats: {formats}, up to {max} MB.",
+    "cancelled": "Upload cancelled"
+  },
+  "reject": {
+    "format": "Format not allowed: .{ext}",
+    "noExtension": "The file has no extension",
+    "empty": "The file is empty",
+    "size": "Exceeds the {max} MB limit",
+    "name": "Invalid file name: it contains characters that are not allowed or is too long",
+    "binary": "The content is not text: it looks like {kind} with a .{ext} extension",
+    "kinds": {
+      "pdf": "a PDF",
+      "zip": "a ZIP, XLSX or DOCX",
+      "exe": "a Windows executable",
+      "elf": "an executable",
+      "png": "a PNG image",
+      "jpeg": "a JPEG image",
+      "gif": "a GIF image",
+      "gzip": "a GZIP archive",
+      "rar": "a RAR archive",
+      "binary": "a binary file"
+    }
+  },
+  "files": {
+    "title": "Files",
+    "recent": "Recent",
+    "search": "Search files…",
+    "refresh": "Refresh",
+    "seeAll": "See all",
+    "all": "All",
+    "loading": "Loading files…",
+    "loadFailed": "Couldn't load the list",
+    "retry": "Retry",
+    "retrying": "Loading…",
+    "noMatch": "Nothing matches the filter",
+    "noMatchHint": "Try another search or status.",
+    "empty": "No files yet",
+    "emptyHint": "Files you upload will appear here.",
+    "columns": {
+      "name": "Name",
+      "type": "Type",
+      "size": "Size",
+      "uploaded": "Uploaded",
+      "status": "Status"
+    }
+  },
+  "status": {
+    "Pending": "Queued",
+    "Processing": "Processing",
+    "Completed": "Completed",
+    "Failed": "Failed"
+  },
+  "detail": {
+    "close": "Close",
+    "status": "Status",
+    "size": "Size",
+    "uploaded": "Uploaded",
+    "processed": "Processed",
+    "failureEyebrow": "API response",
+    "failureTitle": "Couldn't be processed",
+    "failureFallback": "The API couldn't process the file.",
+    "failureHintContent": "Check the file contents (separators, UTF-8 encoding, valid JSON). If you fix it, upload it again; if you think it was a one-off failure, click Process again.",
+    "failureHintFormat": "This format can't be processed. Convert it to one of these and upload it again: {formats}.",
+    "processingAria": "Processing",
+    "processing": "The backend is reading the file. The result will appear here automatically.",
+    "loadingResult": "Loading the result…",
+    "preview": "Preview",
+    "delete": "Delete",
+    "deleteAria": "Delete file",
+    "deleting": "Deleting…",
+    "reprocess": "Process again",
+    "reprocessing": "Sending…",
+    "result": "Result",
+    "downloading": "Downloading…",
+    "downloadFailed": "Couldn't download the result",
+    "summary": {
+      "rows": "Rows",
+      "columns": "Columns",
+      "lines": "Lines",
+      "encoding": "Encoding",
+      "durationMs": "Time"
+    }
+  },
+  "errors": {
+    "unreachable": "Couldn't connect to the API. Make sure it is running.",
+    "400": "The API rejected the request as invalid.",
+    "404": "The file no longer exists in the API.",
+    "409": "The operation isn't possible in the file's current state.",
+    "413": "The file exceeds the maximum size the API accepts.",
+    "415": "The API doesn't accept this content type.",
+    "generic": "Error {status}"
+  },
+  "toasts": {
+    "uploading": { "one": "Uploading {count} file", "other": "Uploading {count} files" },
+    "rejected": { "one": "{count} file not allowed", "other": "{count} files not allowed" },
+    "deleted": "File deleted",
+    "reprocessQueued": "Sent to process again",
+    "language": "Language: English"
+  },
+  "loader": {
+    "default": "Loading"
+  }
+}

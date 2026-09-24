@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type DragEvent } from 'react';
 import { ArrowUp } from 'lucide-react';
 import type { AddResult } from '../hooks/useUploads';
+import { useI18n } from '../i18n';
 import { Composition } from './Composition';
 import { Loader } from './Loader';
 import { SUPPORTED_EXTENSIONS } from '../utils/format';
@@ -15,6 +16,7 @@ interface Props {
 const REJECT_FLASH_MS = 2800;
 
 export function Dropzone({ onFiles, maxMb, uploading = 0 }: Props) {
+  const { t } = useI18n();
   const [over, setOver] = useState(false);
   const [rejected, setRejected] = useState<{ count: number; total: number } | null>(null);
   const input = useRef<HTMLInputElement>(null);
@@ -40,24 +42,21 @@ export function Dropzone({ onFiles, maxMb, uploading = 0 }: Props) {
     void submit(Array.from(e.dataTransfer.files));
   };
 
-  const title = over ? (
-    <>Suéltalos<br /><em>aquí mismo.</em></>
-  ) : rejected ? (
-    rejected.count === 1 ? (
-      <>{rejected.total === 1 ? 'Archivo' : 'Un archivo'}<br /><em>no admitido.</em></>
-    ) : (
-      <>{rejected.count === rejected.total ? 'Archivos' : 'Algunos archivos'}<br /><em>no admitidos.</em></>
-    )
-  ) : (
-    <>Arrastra tus archivos<br /><em>o selecciónalos.</em></>
-  );
+  const showRejected = rejected && !over;
+  const [line1, line2] = over
+    ? [t('dropzone.overTitle'), t('dropzone.overEm')]
+    : rejected
+      ? rejected.count === 1
+        ? [t(rejected.total === 1 ? 'dropzone.rejectedSingle' : 'dropzone.rejectedOneOfMany'), t('dropzone.notAllowedOne')]
+        : [t(rejected.count === rejected.total ? 'dropzone.rejectedAll' : 'dropzone.rejectedSome'), t('dropzone.notAllowedMany')]
+      : [t('dropzone.title'), t('dropzone.titleEm')];
 
   return (
     <div
-      className={`dropzone ${over ? 'is-over' : ''} ${uploading ? 'is-uploading' : ''} ${rejected && !over ? 'is-rejected' : ''}`}
+      className={`dropzone ${over ? 'is-over' : ''} ${uploading ? 'is-uploading' : ''} ${showRejected ? 'is-rejected' : ''}`}
       role="button"
       tabIndex={0}
-      aria-label="Subir archivos"
+      aria-label={t('dropzone.aria')}
       onClick={() => input.current?.click()}
       onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && input.current?.click()}
       onDragEnter={(e) => {
@@ -74,21 +73,21 @@ export function Dropzone({ onFiles, maxMb, uploading = 0 }: Props) {
     >
       <div className="dz-inner">
         <div className="dz-copy">
-          <span className="eyebrow">{rejected && !over ? 'Subida rechazada' : 'Nueva subida'}</span>
-          <p className="dz-title">{title}</p>
+          <span className="eyebrow">{t(showRejected ? 'dropzone.eyebrowRejected' : 'dropzone.eyebrow')}</span>
+          <p className="dz-title">{line1}<br /><em>{line2}</em></p>
           <p className="dz-hint" aria-live="polite">
-            {rejected && !over
-              ? `${rejected.count} de ${rejected.total} ${rejected.total === 1 ? 'archivo no cumple' : 'archivos no cumplen'} los requisitos. Revisa el motivo en Subidas.`
-              : `${SUPPORTED_EXTENSIONS.join(', ').toUpperCase()} · hasta ${maxMb} MB por archivo`}
+            {showRejected
+              ? t('dropzone.rejectedHint', { rejected: rejected.count, count: rejected.total })
+              : t('dropzone.hint', { formats: SUPPORTED_EXTENSIONS.join(', ').toUpperCase(), max: maxMb })}
           </p>
           <span className="btn-primary dz-btn" aria-hidden>
             {uploading ? (
               <>
-                <Loader size="sm" label="Subiendo" /> Subiendo {uploading} {uploading === 1 ? 'archivo' : 'archivos'}…
+                <Loader size="sm" label={t('dropzone.uploadingAria')} /> {t('dropzone.uploading', { count: uploading })}
               </>
             ) : (
               <>
-                <ArrowUp size={16} /> Seleccionar archivos
+                <ArrowUp size={16} /> {t('dropzone.select')}
               </>
             )}
           </span>

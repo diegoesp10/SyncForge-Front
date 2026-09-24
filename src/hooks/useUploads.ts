@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import { api, ApiError } from '../api/client';
-import { validateFile, type RejectCode } from '../utils/validateFile';
+import { validateFile, type Rejection } from '../utils/validateFile';
 
 export interface UploadTask {
   key: string;
@@ -8,8 +8,10 @@ export interface UploadTask {
   progress: number;
   /** rejected: lo descartó la validación del frontal · error: lo rechazó la API o falló la conexión */
   state: 'uploading' | 'done' | 'error' | 'rejected';
+  /** Mensaje de la API (ya en el idioma pedido) o de conexión */
   error?: string;
-  reason?: RejectCode;
+  /** Motivo del rechazo del frontal; se traduce al pintarlo */
+  rejection?: Rejection;
   /** Código HTTP devuelto por la API (0 si no hubo respuesta) */
   status?: number;
 }
@@ -47,7 +49,7 @@ export function useUploads(onUploaded: () => void) {
         .catch((e: unknown) =>
           patch(task.key, {
             state: 'error',
-            error: e instanceof Error ? e.message : 'No se pudo subir el archivo',
+            error: e instanceof Error ? e.message : String(e),
             status: e instanceof ApiError ? e.status : undefined,
           }),
         )
@@ -68,8 +70,7 @@ export function useUploads(onUploaded: () => void) {
         file,
         progress: 0,
         state: rejection ? 'rejected' : 'uploading',
-        error: rejection?.message,
-        reason: rejection?.code,
+        rejection: rejection ?? undefined,
       }));
       setTasks((ts) => [...created, ...ts]);
       queue.current.push(...created.filter((t) => t.state === 'uploading'));

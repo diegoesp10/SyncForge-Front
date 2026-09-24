@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { FileItem } from './api/types';
+import { useI18n, useOnLanguageChange } from './i18n';
 import { useFiles } from './hooks/useFiles';
 import { useUploads } from './hooks/useUploads';
 import { useTheme } from './hooks/useTheme';
@@ -15,13 +16,8 @@ import { FileDetail } from './components/FileDetail';
 import { Connection } from './components/Connection';
 import { Toasts, type Toast } from './components/Toasts';
 
-const titles: Record<View, [string, string]> = {
-  dashboard: ['Panel', 'Sube archivos y deja que el backend haga el resto'],
-  files: ['Archivos', 'Todo lo que has subido y su estado de procesado'],
-  connection: ['Conexión', 'Estado del API y contrato de endpoints'],
-};
-
 export default function App() {
+  const { t } = useI18n();
   const [view, setView] = useState<View>('dashboard');
   const [openId, setOpenId] = useState<string | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -29,12 +25,12 @@ export default function App() {
   const backend = useBackendStatus();
   const { files, loading, error, refresh, remove, reprocess } = useFiles();
   const uploads = useUploads(refresh);
-  const uploading = uploads.tasks.filter((t) => t.state === 'uploading').length;
+  const uploading = uploads.tasks.filter((task) => task.state === 'uploading').length;
 
   const toast = useCallback((text: string, tone: Toast['tone'] = 'ok') => {
     const id = crypto.randomUUID();
-    setToasts((t) => [...t, { id, text, tone }]);
-    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 3200);
+    setToasts((list) => [...list, { id, text, tone }]);
+    setTimeout(() => setToasts((list) => list.filter((x) => x.id !== id)), 3200);
   }, []);
 
   // Si falla la carga de archivos, comprobar al momento si la API sigue en pie
@@ -43,6 +39,14 @@ export default function App() {
     if (error) void check();
   }, [error, check]);
 
+  // Al cambiar de idioma se vuelve a pedir todo a la API para que sus mensajes (errores de procesado,
+  // avisos) lleguen traducidos con el nuevo Accept-Language
+  useOnLanguageChange(() => {
+    void refresh();
+    void check();
+    toast(t('toasts.language'));
+  });
+
   // Mantener el detalle sincronizado con el sondeo
   const openFile = useMemo(() => files.find((f) => f.id === openId) ?? null, [files, openId]);
   const open = (f: FileItem) => setOpenId(f.id);
@@ -50,15 +54,15 @@ export default function App() {
 
   const handleFiles = async (list: File[]) => {
     const result = await uploads.add(list);
-    if (result.accepted) toast(result.accepted === 1 ? 'Subiendo 1 archivo' : `Subiendo ${result.accepted} archivos`);
-    if (result.rejected) toast(result.rejected === 1 ? '1 archivo no admitido' : `${result.rejected} archivos no admitidos`, 'err');
+    if (result.accepted) toast(t('toasts.uploading', { count: result.accepted }));
+    if (result.rejected) toast(t('toasts.rejected', { count: result.rejected }), 'err');
     return result;
   };
 
   const handleDelete = async (id: string) => {
     try {
       await remove(id);
-      toast('Archivo eliminado');
+      toast(t('toasts.deleted'));
     } catch (e) {
       toast((e as Error).message, 'err');
     }
@@ -67,19 +71,17 @@ export default function App() {
   const handleReprocess = async (id: string) => {
     try {
       await reprocess(id);
-      toast('Enviado a reprocesar');
+      toast(t('toasts.reprocessQueued'));
     } catch (e) {
       toast((e as Error).message, 'err');
     }
   };
 
-  const [title, subtitle] = titles[view];
-
   return (
     <div className="app">
       <Sidebar view={view} onChange={setView} />
       <main className="main">
-        <Header title={title} subtitle={subtitle} backend={backend} theme={theme} onTheme={setTheme} />
+        <Header title={t(`app.${view}.title`)} subtitle={t(`app.${view}.subtitle`)} backend={backend} theme={theme} onTheme={setTheme} />
 
         <div className="content" key={view}>
           <OfflineBanner status={backend} />
@@ -91,7 +93,7 @@ export default function App() {
                 <UploadQueue tasks={uploads.tasks} maxMb={uploads.maxMb} onCancel={uploads.cancel} onClear={uploads.clearFinished} />
               </div>
               <FileList
-                title="Recientes"
+                title={t('files.recent')}
                 files={files}
                 loading={loading}
                 error={error}
