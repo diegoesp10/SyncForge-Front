@@ -1,0 +1,89 @@
+# ─── Dependencias (se regeneran con `pnpm install`) ───────────────
+node_modules/
+.pnpm-store/
+.pnpm-debug.log*
+
+# ─── Builds y artefactos generados ────────────────────────────────
+dist/
+dist-ssr/
+build/
+out/
+storybook-static/
+stats.html
+*.tsbuildinfo
+*.local
+
+# ─── Cachés de herramientas ───────────────────────────────────────
+.cache/
+.vite/
+.eslintcache
+.stylelintcache
+.prettiercache
+.turbo/
+.parcel-cache/
+
+# ─── Tests y cobertura ────────────────────────────────────────────
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+playwright/.cache/
+
+# ─── Variables de entorno y secretos (solo se sube la plantilla) ──
+.env
+.env.*
+!.env.example
+.npmrc
+*.pem
+*.key
+*.crt
+*.pfx
+*.p12
+certs/
+
+# ─── Despliegues locales ──────────────────────────────────────────
+.vercel/
+.netlify/
+
+# ─── Logs ─────────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ─── Asistentes de IA (configuración y notas locales) ─────────────
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+Claude outputs/
+.cursor/
+.cursorrules
+.windsurf/
+.windsurfrules
+.aider*
+.continue/
+.codeium/
+.copilot/
+AGENTS.md
+GEMINI.md
+
+# ─── Editores e IDE (solo se comparten las extensiones recomendadas) ─
+.vscode/*
+!.vscode/extensions.json
+.vs/
+.idea/
+*.suo
+*.user
+*.sln.docstates
+*.swp
+*.swo
+*~
+
+# ─── Sistema operativo ────────────────────────────────────────────
+.DS_Store
+._*
+Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
