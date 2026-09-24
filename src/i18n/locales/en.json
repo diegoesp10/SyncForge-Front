@@ -6,13 +6,16 @@
   "app": {
     "dashboard": { "title": "Dashboard", "subtitle": "Upload files and let the backend do the rest" },
     "files": { "title": "Files", "subtitle": "Everything you have uploaded and its processing status" },
-    "connection": { "title": "Connection", "subtitle": "API status and endpoint contract" }
+    "connection": { "title": "Connection", "subtitle": "API status and endpoint contract" },
+    "trash": { "title": "Trash", "subtitle": "Removed files: they are deleted automatically 30 days after being moved here" }
   },
   "nav": {
     "aria": "Main",
     "dashboard": "Dashboard",
     "files": "Files",
+    "trash": "Trash",
     "connection": "Connection",
+    "trashCount": { "one": "{count} file in the trash", "other": "{count} files in the trash" },
     "artLine1": "Upload, process",
     "artLine2": "and review.",
     "version": "v0.1 · frontend"
@@ -68,10 +71,44 @@
     "health": "Backend status",
     "upload": "Multipart upload (\"file\" field)",
     "list": "File list",
-    "detail": "Details and status",
     "result": "Processing result",
     "reprocess": "Process again",
-    "delete": "Delete file"
+    "moveToTrash": "Move to trash",
+    "trashList": "Trash contents",
+    "trashResult": "Result of a file in the trash",
+    "restore": "Restore from trash",
+    "purge": "Delete permanently"
+  },
+  "trash": {
+    "title": "In the trash",
+    "noticeTitle": "Empties itself after 30 days",
+    "notice": "Each file is permanently deleted 30 days after it is moved to the trash. Until then you can restore it with one click.",
+    "loading": "Loading the trash…",
+    "loadFailed": "Couldn't load the trash",
+    "empty": "The trash is empty",
+    "emptyHint": "Files you move to the trash stay here for 30 days before being deleted.",
+    "columns": {
+      "name": "Name",
+      "size": "Size",
+      "moved": "Moved",
+      "purge": "Deletion",
+      "actions": "Actions"
+    },
+    "purgesIn": "Deleted {when}",
+    "purgingSoon": "Will be deleted shortly",
+    "purgeDate": "Permanent deletion: {date}",
+    "restore": "Restore",
+    "restoring": "Restoring…",
+    "restoreAria": "Restore {name}",
+    "purge": "Delete",
+    "purgeConfirm": "Delete forever?",
+    "purging": "Deleting…",
+    "purgeAria": "Permanently delete {name}",
+    "emptyAll": "Empty trash",
+    "emptyConfirm": "Empty everything?",
+    "emptying": "Emptying…",
+    "inTrash": "In the trash",
+    "detailBanner": "It has been in the trash since {moved}. It will be permanently deleted {when} ({date}); until then you can restore it."
   },
   "stats": {
     "files": "Files",
@@ -193,9 +230,10 @@
     "processing": "The backend is reading the file. The result will appear here automatically.",
     "loadingResult": "Loading the result…",
     "preview": "Preview",
-    "delete": "Delete",
-    "deleteAria": "Delete file",
-    "deleting": "Deleting…",
+    "moveToTrash": "Move to trash",
+    "moveToTrashAria": "Move the file to the trash",
+    "moving": "Moving…",
+    "cantTrashProcessing": "It can't be moved to the trash while it's processing",
     "reprocess": "Process again",
     "reprocessing": "Sending…",
     "result": "Result",
@@ -221,7 +259,11 @@
   "toasts": {
     "uploading": { "one": "Uploading {count} file", "other": "Uploading {count} files" },
     "rejected": { "one": "{count} file not allowed", "other": "{count} files not allowed" },
-    "deleted": "File deleted",
+    "movedToTrash": "Moved to the trash. It will be deleted {when}.",
+    "undo": "Undo",
+    "restored": "File restored",
+    "purged": "Permanently deleted",
+    "emptied": { "one": "{count} file permanently deleted", "other": "{count} files permanently deleted" },
     "reprocessQueued": "Sent to process again",
     "language": "Language: English"
   },

@@ -203,6 +203,25 @@ em { font-style: italic; }
 .sidebar li button.active { color: var(--text); background: var(--surface); box-shadow: inset 0 0 0 1px var(--border), var(--shadow); }
 .sidebar li button.active svg { color: var(--accent); }
 .nav-num { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--text-3); }
+.nav-icon { position: relative; display: inline-grid; place-items: center; }
+/* Contador de la papelera sobre el icono (se ve igual en la barra lateral, el raíl y la barra inferior) */
+.nav-count {
+  position: absolute;
+  top: -7px;
+  right: -10px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--red);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 17px;
+  text-align: center;
+  box-shadow: 0 0 0 2px var(--bg);
+}
 .sidebar li button.active .nav-num { color: var(--accent); }
 .sidebar-foot { margin-top: auto; display: flex; flex-direction: column; gap: 14px; padding: 0 4px; font-size: 12px; color: var(--text-3); }
 .sidebar-foot > span { padding: 0 8px; }
@@ -943,6 +962,94 @@ button.conn:hover { border-color: var(--border-strong); color: var(--text); }
   animation: fadeUp 0.4s var(--ease) both;
 }
 .banner-warn { --tone: var(--ochre); }
+
+/* ============ Papelera ============ */
+.trash-view { display: flex; flex-direction: column; gap: var(--gap); }
+/* Aviso de vaciado automático: reloj geométrico (círculo ocre con un sector que avanza) */
+.trash-notice {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: clamp(18px, 1.6vw, 26px);
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--ochre) 45%, var(--border));
+  background: color-mix(in srgb, var(--ochre) 9%, var(--surface));
+}
+.trash-notice p { color: var(--text-2); font-size: 14px; max-width: 70ch; }
+.trash-notice .trash-notice-title { font-family: var(--serif); font-size: 26px; line-height: 1.1; color: var(--text); margin-bottom: 4px; }
+.trash-clock {
+  position: relative;
+  flex-shrink: 0;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: conic-gradient(var(--ochre) 0 83%, color-mix(in srgb, var(--ochre) 25%, transparent) 0);
+}
+.trash-clock i {
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  width: 2px;
+  height: 21px;
+  margin-left: -1px;
+  border-radius: 2px;
+  background: var(--text);
+  transform-origin: 50% 100%;
+  animation: turn 12s linear infinite;
+}
+.trash-clock::after {
+  content: '';
+  position: absolute;
+  inset: 25px;
+  border-radius: 50%;
+  background: var(--text);
+}
+
+/* Cuenta atrás hasta la eliminación definitiva */
+.purge { display: flex; flex-direction: column; gap: 6px; min-width: 150px; font-size: 13px; color: var(--text-2); }
+.purge-bar { display: block; height: 4px; border-radius: 99px; background: var(--surface-3); overflow: hidden; }
+.purge-bar b { display: block; height: 100%; border-radius: inherit; background: var(--ochre); transition: width 0.4s var(--ease); }
+.purge.is-soon { color: var(--err); font-weight: 500; }
+.purge.is-soon .purge-bar b { background: var(--red); }
+
+.trash-actions { display: inline-flex; align-items: center; justify-content: flex-end; gap: 6px; }
+.trash-list .table td { vertical-align: middle; }
+.file-cards li.trash-card { align-items: flex-start; }
+.trash-card .fc-body { gap: 8px; }
+.trash-card .trash-actions { justify-content: flex-start; margin-top: 2px; }
+
+/* Botón de confirmación armado (segundo clic = acción irreversible) */
+.is-armed.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  padding: 0 14px;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.is-armed, .is-armed.btn-ghost {
+  color: #fff !important;
+  background: var(--red) !important;
+  border-color: var(--red) !important;
+  animation: armed 0.35s var(--ease);
+}
+@keyframes armed { from { transform: scale(0.94); } }
+
+/* Aviso dentro del detalle cuando el archivo está en la papelera */
+.trash-banner {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 16px 18px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--ochre) 12%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--ochre) 40%, var(--border));
+}
+.trash-banner > svg { flex-shrink: 0; margin-top: 2px; color: var(--warn); }
+.trash-banner > div { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
+.trash-banner p { font-size: 13.5px; color: var(--text-2); }
 .banner p { flex: 1; min-width: 0; font-size: 13.5px; color: var(--text-2); }
 .banner b { color: var(--text); font-weight: 600; }
 .endpoints { display: flex; flex-direction: column; }
@@ -971,6 +1078,18 @@ button.conn:hover { border-color: var(--border-strong); color: var(--text); }
 }
 .toast-ok svg { color: var(--ok); }
 .toast-err svg { color: var(--err); }
+.toast svg { flex-shrink: 0; }
+.toast-action {
+  margin-left: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  transition: background-color 0.2s;
+}
+.toast-action:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
 @keyframes toastIn { from { opacity: 0; transform: translateY(12px) scale(0.96); } }
 
 /* ============ Responsive ============ */
@@ -1008,7 +1127,12 @@ button.conn:hover { border-color: var(--border-strong); color: var(--text); }
   .sidebar .logo { display: none; }
   .sidebar ul { flex-direction: row; flex: 1; justify-content: space-around; }
   .sidebar li { flex: 1; }
-  .sidebar li button { flex-direction: column; gap: 3px; padding: 8px 4px; font-size: 11.5px; height: 100%; }
+  .sidebar li button { flex-direction: column; gap: 3px; padding: 8px 2px; font-size: 11px; height: 100%; }
+  .trash-notice { align-items: flex-start; gap: 14px; }
+  .trash-clock { width: 44px; height: 44px; }
+  .trash-clock i { top: 6px; height: 16px; }
+  .trash-clock::after { inset: 19px; }
+  .trash-notice .trash-notice-title { font-size: 22px; }
   .nav-label { display: inline; }
   .sidebar li button.active { background: none; box-shadow: none; }
   .main { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }

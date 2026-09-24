@@ -6,13 +6,16 @@
   "app": {
     "dashboard": { "title": "Panel", "subtitle": "Sube archivos y deja que el backend haga el resto" },
     "files": { "title": "Archivos", "subtitle": "Todo lo que has subido y su estado de procesado" },
-    "connection": { "title": "Conexión", "subtitle": "Estado de la API y contrato de endpoints" }
+    "connection": { "title": "Conexión", "subtitle": "Estado de la API y contrato de endpoints" },
+    "trash": { "title": "Papelera", "subtitle": "Archivos retirados: se eliminan solos 30 días después de moverlos aquí" }
   },
   "nav": {
     "aria": "Principal",
     "dashboard": "Panel",
     "files": "Archivos",
+    "trash": "Papelera",
     "connection": "Conexión",
+    "trashCount": { "one": "{count} archivo en la papelera", "other": "{count} archivos en la papelera" },
     "artLine1": "Sube, procesa",
     "artLine2": "y revisa.",
     "version": "v0.1 · frontal"
@@ -68,10 +71,44 @@
     "health": "Estado del backend",
     "upload": "Subida multipart (campo \"file\")",
     "list": "Listado de archivos",
-    "detail": "Detalle y estado",
     "result": "Resultado del procesado",
     "reprocess": "Volver a procesar",
-    "delete": "Eliminar archivo"
+    "moveToTrash": "Mover a la papelera",
+    "trashList": "Contenido de la papelera",
+    "trashResult": "Resultado de un archivo en la papelera",
+    "restore": "Restaurar desde la papelera",
+    "purge": "Eliminar definitivamente"
+  },
+  "trash": {
+    "title": "En la papelera",
+    "noticeTitle": "Se vacía sola a los 30 días",
+    "notice": "Cada archivo se elimina definitivamente 30 días después de moverlo a la papelera. Hasta entonces puedes restaurarlo con un clic.",
+    "loading": "Cargando la papelera…",
+    "loadFailed": "No se pudo cargar la papelera",
+    "empty": "La papelera está vacía",
+    "emptyHint": "Los archivos que muevas a la papelera se quedarán aquí 30 días antes de eliminarse.",
+    "columns": {
+      "name": "Nombre",
+      "size": "Tamaño",
+      "moved": "Movido",
+      "purge": "Eliminación",
+      "actions": "Acciones"
+    },
+    "purgesIn": "Se elimina {when}",
+    "purgingSoon": "Se eliminará en breve",
+    "purgeDate": "Eliminación definitiva: {date}",
+    "restore": "Restaurar",
+    "restoring": "Restaurando…",
+    "restoreAria": "Restaurar {name}",
+    "purge": "Eliminar",
+    "purgeConfirm": "¿Eliminar para siempre?",
+    "purging": "Eliminando…",
+    "purgeAria": "Eliminar {name} definitivamente",
+    "emptyAll": "Vaciar papelera",
+    "emptyConfirm": "¿Vaciar todo?",
+    "emptying": "Vaciando…",
+    "inTrash": "En la papelera",
+    "detailBanner": "Está en la papelera desde el {moved}. Se eliminará definitivamente {when} ({date}); hasta entonces puedes restaurarlo."
   },
   "stats": {
     "files": "Archivos",
@@ -193,9 +230,10 @@
     "processing": "El backend está leyendo el archivo. El resultado aparecerá aquí automáticamente.",
     "loadingResult": "Leyendo el resultado…",
     "preview": "Vista previa",
-    "delete": "Eliminar",
-    "deleteAria": "Eliminar archivo",
-    "deleting": "Eliminando…",
+    "moveToTrash": "Mover a la papelera",
+    "moveToTrashAria": "Mover el archivo a la papelera",
+    "moving": "Moviendo…",
+    "cantTrashProcessing": "No se puede mover a la papelera mientras se procesa",
     "reprocess": "Reprocesar",
     "reprocessing": "Enviando…",
     "result": "Resultado",
@@ -221,7 +259,11 @@
   "toasts": {
     "uploading": { "one": "Subiendo {count} archivo", "other": "Subiendo {count} archivos" },
     "rejected": { "one": "{count} archivo no admitido", "other": "{count} archivos no admitidos" },
-    "deleted": "Archivo eliminado",
+    "movedToTrash": "Movido a la papelera. Se eliminará {when}.",
+    "undo": "Deshacer",
+    "restored": "Archivo restaurado",
+    "purged": "Eliminado definitivamente",
+    "emptied": { "one": "{count} archivo eliminado definitivamente", "other": "{count} archivos eliminados definitivamente" },
     "reprocessQueued": "Enviado a reprocesar",
     "language": "Idioma: español"
   },

@@ -39,9 +39,11 @@ export function useFiles() {
     };
   }, [refresh]);
 
-  const remove = useCallback(async (id: string) => {
-    await api.deleteFile(id);
+  /** Mueve el archivo a la papelera: desaparece del listado y devuelve la entrada con su fecha de purga */
+  const moveToTrash = useCallback(async (id: string) => {
+    const item = await api.moveToTrash(id);
     setFiles((fs) => fs.filter((f) => f.id !== id));
+    return item;
   }, []);
 
   const reprocess = useCallback(async (id: string) => {
@@ -49,5 +51,5 @@ export function useFiles() {
     await refresh();
   }, [refresh]);
 
-  return { files, loading, error, refresh, remove, reprocess };
+  return { files, loading, error, refresh, moveToTrash, reprocess };
 }

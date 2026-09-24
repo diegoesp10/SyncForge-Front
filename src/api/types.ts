@@ -14,6 +14,12 @@ export interface FileItem {
   error?: string | null;
 }
 
+/** Archivo en la papelera (TrashCanFileResponse): se elimina solo en purgeAt = movedAt + 30 días */
+export interface TrashItem extends FileItem {
+  movedAt: string; // ISO 8601
+  purgeAt: string; // ISO 8601
+}
+
 export type PreviewKind = 'table' | 'text' | 'json';
 
 export interface FileResult {

@@ -1,4 +1,4 @@
-import type { FileItem, FileResult, HealthInfo } from './types';
+import type { FileItem, FileResult, HealthInfo, TrashItem } from './types';
 import type { Lang, MessageKey, Translate } from '../i18n';
 
 const BASE = '/api';
@@ -96,9 +96,15 @@ export const api = {
   listFiles: () => request<FileItem[]>('/files'),
   getFile: (id: string) => request<FileItem>(`/files/${id}`),
   getResult: (id: string) => request<FileResult>(`/files/${id}/result`),
-  deleteFile: (id: string) => request<void>(`/files/${id}`, { method: 'DELETE' }),
   reprocess: (id: string) => request<FileItem>(`/files/${id}/reprocess`, { method: 'POST' }),
   upload: uploadWithProgress,
+
+  // Papelera (TrashCanController): el archivo sale de /files y se elimina solo a los 30 días
+  moveToTrash: (id: string) => request<TrashItem>(`/trash-can/${id}`, { method: 'POST' }),
+  listTrash: () => request<TrashItem[]>('/trash-can'),
+  getTrashResult: (id: string) => request<FileResult>(`/trash-can/${id}/result`),
+  restore: (id: string) => request<FileItem>(`/trash-can/${id}/restore`, { method: 'POST' }),
+  purge: (id: string) => request<void>(`/trash-can/${id}`, { method: 'DELETE' }),
 };
 
 export type BackendState = 'online' | 'degraded' | 'offline';

@@ -17,7 +17,20 @@ Contrato verificado contra el backend de SyncForge (`API/Controllers/FilesContro
 | GET | `/api/files/{id}` | `FileItem` |
 | GET | `/api/files/{id}/result` | `FileResult` (solo cuando `status = Completed`; si no, `409`) |
 | POST | `/api/files/{id}/reprocess` | `FileItem` |
-| DELETE | `/api/files/{id}` | `204` |
+| DELETE | `/api/files/{id}` | `204` · mueve el archivo a la papelera (el frontal usa `POST /api/trash-can/{id}`) |
+
+### Papelera (`TrashCanController`)
+
+Un archivo en la papelera deja de salir en `GET /api/files`. Se elimina solo 30 días después de moverlo (`purgeAt = movedAt + 30 días`); `TrashCanCleanupWorker` revisa los caducados cada 5 minutos.
+
+| Método | Ruta | Respuesta |
+|---|---|---|
+| POST | `/api/trash-can/{id}` | `201` + `TrashItem` · `409` si está en `Processing` o ya está en la papelera |
+| GET | `/api/trash-can` | `TrashItem[]` |
+| GET | `/api/trash-can/{id}` | `TrashItem` |
+| GET | `/api/trash-can/{id}/result` | `FileResult` del archivo en la papelera |
+| POST | `/api/trash-can/{id}/restore` | `FileItem` · `409` si ya ha empezado su eliminación o ha caducado |
+| DELETE | `/api/trash-can/{id}` | `204` · eliminación definitiva (registro y archivo almacenado) |
 
 El frontal consulta `/api/health` cada 15 s y bajo demanda para mostrar si la API está levantada: `200` + `status: "ok"` → en línea · `503` → con fallos · sin respuesta, `502`/`504` del proxy o más de 4 s → caída.
 
@@ -57,6 +70,11 @@ FileResult {
   }
   warnings: string[] | null            // traducidos según el idioma
 }
+
+TrashItem = FileItem & {
+  movedAt: string   // ISO 8601, cuándo se movió a la papelera
+  purgeAt: string   // ISO 8601, movedAt + 30 días: eliminación automática
+}
 ```
 
 ## Equivalente en C# (`Contracts/Files`)
@@ -75,6 +93,11 @@ public sealed record FileResultResponse(
     FilePreviewResponse Preview, IReadOnlyList<string>? Warnings);
 
 public sealed record HealthResponse(string Status, string Version);
+
+public sealed record TrashCanFileResponse(
+    Guid Id, string FileName, string ContentType, long Size, string Status,
+    DateTimeOffset UploadedAt, DateTimeOffset? ProcessedAt, int? Progress, string? Error,
+    DateTimeOffset MovedAt, DateTimeOffset PurgeAt);
 ```
 
 `Status` viaja como texto con los valores del enum `Domain.Files.FileStatus` (`Pending`, `Processing`, `Completed`, `Failed`).

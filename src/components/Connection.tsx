@@ -2,14 +2,18 @@ import type { BackendStatus } from '../hooks/useBackendStatus';
 import { useI18n, type MessageKey } from '../i18n';
 import { BackendPanel } from './BackendStatus';
 
+// Endpoints que usa el frontal (ver API_CONTRACT.md)
 const endpoints: [string, string, MessageKey][] = [
   ['GET', '/api/health', 'connection.health'],
   ['POST', '/api/files', 'connection.upload'],
   ['GET', '/api/files', 'connection.list'],
-  ['GET', '/api/files/{id}', 'connection.detail'],
   ['GET', '/api/files/{id}/result', 'connection.result'],
   ['POST', '/api/files/{id}/reprocess', 'connection.reprocess'],
-  ['DELETE', '/api/files/{id}', 'connection.delete'],
+  ['POST', '/api/trash-can/{id}', 'connection.moveToTrash'],
+  ['GET', '/api/trash-can', 'connection.trashList'],
+  ['GET', '/api/trash-can/{id}/result', 'connection.trashResult'],
+  ['POST', '/api/trash-can/{id}/restore', 'connection.restore'],
+  ['DELETE', '/api/trash-can/{id}', 'connection.purge'],
 ];
 
 export function Connection({ backend }: { backend: BackendStatus }) {

@@ -23,6 +23,7 @@ Aplicación web para **subir archivos** y seguir cómo los procesa el backend de
 - Panel con métricas y listado con búsqueda y filtros por estado.
 - Panel lateral de detalle: estado, resumen y vista previa del resultado (tabla, JSON o texto).
 - Actualización automática: cada 1 s mientras hay archivos en cola o procesándose, cada 8 s si no.
+- **Papelera:** los archivos se mueven a la papelera (con opción de deshacer) y desde ahí se restauran o se eliminan definitivamente. Cada uno muestra cuánto le queda: la API los elimina sola 30 días después de moverlos.
 - Estado de la API a la vista: indicador en la cabecera (con latencia), aviso si deja de responder y panel en **Conexión** con el historial de comprobaciones. Se comprueba cada 15 s y al pulsar el indicador.
 - Interfaz en **español e inglés**, con selector ES / EN en la cabecera. Los textos están en `src/i18n/locales/es.json` y `en.json`, y el idioma elegido se envía a la API (`Accept-Language`) para que sus mensajes lleguen en el mismo idioma.
 - Indicadores de carga en cada acción que espera a la API (actualizar, reprocesar, eliminar, descargar, subir).
@@ -144,8 +145,8 @@ Instala las dependencias en la misma plataforma donde vas a ejecutar el proyecto
 src/
   api/          types.ts (DTOs) · client.ts (fetch/XHR y comprobación de salud)
   i18n/         index.tsx (I18nProvider, useI18n, t) · locales/es.json · locales/en.json
-  hooks/        useFiles (listado + sondeo) · useUploads (cola de subida) · useBackendStatus (salud de la API) · useTheme
-  components/   Sidebar, Header, StatCards, Dropzone, UploadQueue, FileList, FileDetail, FilePreview, BackendStatus, Loader, AsyncButton…
+  hooks/        useFiles (listado + sondeo) · useUploads (cola de subida) · useTrash (papelera) · useBackendStatus (salud de la API) · useTheme
+  components/   Sidebar, Header, StatCards, Dropzone, UploadQueue, FileList, FileDetail, FilePreview, TrashView, BackendStatus, Loader, AsyncButton, ConfirmButton…
   styles/       index.css (tokens de diseño + responsive)
   utils/        format.ts (tamaños, fechas relativas, tipo de archivo)
 ```

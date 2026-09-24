@@ -1,26 +1,35 @@
 import { useEffect, useState } from 'react';
-import { X, RotateCw, Trash2, Download, AlertTriangle } from 'lucide-react';
+import { X, RotateCw, RotateCcw, Trash2, Download, AlertTriangle, Clock } from 'lucide-react';
 import { api } from '../api/client';
-import type { FileItem, FileResult } from '../api/types';
+import type { FileItem, FileResult, TrashItem } from '../api/types';
 import { useI18n } from '../i18n';
 import { FileIcon } from './FileIcon';
 import { AsyncButton } from './AsyncButton';
+import { ConfirmButton } from './ConfirmButton';
 import { Loader, LoadingState } from './Loader';
 import { StatusBadge } from './StatusBadge';
 import { FilePreview } from './FilePreview';
-import { extOf, formatBytes, formatDate, SUPPORTED_EXTENSIONS } from '../utils/format';
+import { PurgeCountdown } from './TrashView';
+import { daysUntil, extOf, formatBytes, formatDate, formatDay, inDays, SUPPORTED_EXTENSIONS } from '../utils/format';
 
 interface Props {
-  file: FileItem | null;
+  /** Archivo del listado o de la papelera (según `mode`) */
+  file: FileItem | TrashItem | null;
+  mode: 'files' | 'trash';
   onClose: () => void;
-  onDelete: (id: string) => Promise<void>;
+  /** Las acciones devuelven true si han ido bien: solo entonces se cierra el panel */
+  onTrash: (id: string) => Promise<boolean>;
   onReprocess: (id: string) => Promise<void>;
+  onRestore: (id: string) => Promise<boolean>;
+  onPurge: (id: string) => Promise<boolean>;
 }
 
-export function FileDetail({ file: current, onClose, onDelete, onReprocess }: Props) {
+const isTrashItem = (f: FileItem | TrashItem): f is TrashItem => 'purgeAt' in f;
+
+export function FileDetail({ file: current, mode, onClose, onTrash, onReprocess, onRestore, onPurge }: Props) {
   const { t, has, lang, locale } = useI18n();
   // Conserva el último archivo mientras el panel se cierra para que la animación no quede vacía
-  const [last, setLast] = useState<FileItem | null>(current);
+  const [last, setLast] = useState<FileItem | TrashItem | null>(current);
   useEffect(() => {
     if (current) setLast(current);
   }, [current]);
@@ -38,15 +47,14 @@ export function FileDetail({ file: current, onClose, onDelete, onReprocess }: Pr
     if (!file || status !== 'Completed') return;
     let alive = true;
     setLoading(true);
-    api
-      .getResult(file.id)
+    (mode === 'trash' ? api.getTrashResult(file.id) : api.getResult(file.id))
       .then((r) => alive && setResult(r))
       .catch((e: Error) => alive && setErr(e.message))
       .finally(() => alive && setLoading(false));
     return () => {
       alive = false;
     };
-  }, [file?.id, status, lang]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [file?.id, status, lang, mode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -59,7 +67,7 @@ export function FileDetail({ file: current, onClose, onDelete, onReprocess }: Pr
   const download = async () => {
     if (!file) return;
     try {
-      const fresh = await api.getResult(file.id);
+      const fresh = await (mode === 'trash' ? api.getTrashResult(file.id) : api.getResult(file.id));
       const blob = new Blob([JSON.stringify(fresh, null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -73,6 +81,7 @@ export function FileDetail({ file: current, onClose, onDelete, onReprocess }: Pr
 
   const formats = SUPPORTED_EXTENSIONS.map((e) => `.${e}`).join(', ');
   const supported = file ? SUPPORTED_EXTENSIONS.includes(extOf(file.fileName)) : false;
+  const trashed = file && mode === 'trash' && isTrashItem(file) ? file : null;
 
   return (
     <>
@@ -92,6 +101,23 @@ export function FileDetail({ file: current, onClose, onDelete, onReprocess }: Pr
             </header>
 
             <div className="drawer-body">
+              {trashed && (
+                <div className="trash-banner" role="note">
+                  <Clock size={18} aria-hidden />
+                  <div>
+                    <span className="eyebrow">{t('trash.inTrash')}</span>
+                    <p>
+                      {t('trash.detailBanner', {
+                        moved: formatDay(trashed.movedAt, locale),
+                        when: daysUntil(trashed.purgeAt) > 0 ? inDays(daysUntil(trashed.purgeAt), locale) : t('trash.purgingSoon'),
+                        date: formatDay(trashed.purgeAt, locale),
+                      })}
+                    </p>
+                    <PurgeCountdown item={trashed} />
+                  </div>
+                </div>
+              )}
+
               <div className="meta-grid">
                 <div><span>{t('detail.status')}</span><StatusBadge status={file.status} progress={file.progress} /></div>
                 <div><span>{t('detail.size')}</span><b className="mono">{formatBytes(file.size)}</b></div>
@@ -154,26 +180,56 @@ export function FileDetail({ file: current, onClose, onDelete, onReprocess }: Pr
               )}
             </div>
 
-            <footer className="drawer-foot">
-              <AsyncButton
-                className="btn-ghost danger"
-                icon={<Trash2 size={16} />}
-                busyLabel={t('detail.deleting')}
-                aria-label={t('detail.deleteAria')}
-                onClick={() => onDelete(file.id).then(onClose)}
-              >
-                {t('detail.delete')}
-              </AsyncButton>
-              <div className="spacer" />
-              {(file.status === 'Failed' || file.status === 'Completed') && supported && (
-                <AsyncButton className="btn-ghost" icon={<RotateCw size={16} />} busyLabel={t('detail.reprocessing')} onClick={() => onReprocess(file.id)}>
-                  {t('detail.reprocess')}
+            {trashed ? (
+              <footer className="drawer-foot">
+                <ConfirmButton
+                  className="btn-ghost danger"
+                  icon={<Trash2 size={16} />}
+                  confirmLabel={t('trash.purgeConfirm')}
+                  busyLabel={t('trash.purging')}
+                  aria-label={t('trash.purgeAria', { name: file.fileName })}
+                  onConfirm={() => onPurge(file.id).then((ok) => ok && onClose())}
+                >
+                  {t('trash.purge')}
+                </ConfirmButton>
+                <div className="spacer" />
+                <AsyncButton className="btn-ghost" icon={<Download size={16} />} busyLabel={t('detail.downloading')} disabled={!result} onClick={download}>
+                  {t('detail.result')}
                 </AsyncButton>
-              )}
-              <AsyncButton className="btn-primary" icon={<Download size={16} />} busyLabel={t('detail.downloading')} disabled={!result} onClick={download}>
-                {t('detail.result')}
-              </AsyncButton>
-            </footer>
+                <AsyncButton
+                  className="btn-primary"
+                  icon={<RotateCcw size={16} />}
+                  busyLabel={t('trash.restoring')}
+                  onClick={() => onRestore(file.id).then((ok) => ok && onClose())}
+                >
+                  {t('trash.restore')}
+                </AsyncButton>
+              </footer>
+            ) : (
+              <footer className="drawer-foot">
+                <AsyncButton
+                  className="btn-ghost danger"
+                  icon={<Trash2 size={16} />}
+                  busyLabel={t('detail.moving')}
+                  aria-label={t('detail.moveToTrashAria')}
+                  // La API no deja moverlo mientras se procesa (409): se desactiva y se explica
+                  disabled={file.status === 'Processing'}
+                  title={file.status === 'Processing' ? t('detail.cantTrashProcessing') : undefined}
+                  onClick={() => onTrash(file.id).then((ok) => ok && onClose())}
+                >
+                  {t('detail.moveToTrash')}
+                </AsyncButton>
+                <div className="spacer" />
+                {(file.status === 'Failed' || file.status === 'Completed') && supported && (
+                  <AsyncButton className="btn-ghost" icon={<RotateCw size={16} />} busyLabel={t('detail.reprocessing')} onClick={() => onReprocess(file.id)}>
+                    {t('detail.reprocess')}
+                  </AsyncButton>
+                )}
+                <AsyncButton className="btn-primary" icon={<Download size={16} />} busyLabel={t('detail.downloading')} disabled={!result} onClick={download}>
+                  {t('detail.result')}
+                </AsyncButton>
+              </footer>
+            )}
           </>
         )}
       </aside>

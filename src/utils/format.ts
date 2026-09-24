@@ -32,6 +32,23 @@ export function formatDate(iso: string | null | undefined, locale: string): stri
   return new Date(iso).toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' });
 }
 
+/** Solo el día: "24 de octubre de 2026" / "24 October 2026" */
+export function formatDay(iso: string, locale: string): string {
+  return new Date(iso).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+const DAY_MS = 86_400_000;
+
+/** Días (redondeados hacia arriba) que faltan hasta una fecha; 0 o menos si ya ha pasado */
+export function daysUntil(iso: string, now = Date.now()): number {
+  return Math.ceil((new Date(iso).getTime() - now) / DAY_MS);
+}
+
+/** "mañana", "dentro de 29 días" / "tomorrow", "in 29 days" */
+export function inDays(days: number, locale: string): string {
+  return rtf(locale).format(days, 'day');
+}
+
 export function extOf(name: string): string {
   const i = name.lastIndexOf('.');
   return i >= 0 ? name.slice(i + 1).toLowerCase() : '';
