@@ -1,7 +1,5 @@
 import type { FileItem, FileResult, HealthInfo } from './types';
-import { mockApi } from './mock';
 
-export const USE_MOCK = import.meta.env.VITE_USE_MOCK !== 'false';
 const BASE = '/api';
 // La API traduce errores y avisos según Accept-Language (o ?language=); la interfaz está en español
 const LANGUAGE = 'es';
@@ -69,7 +67,7 @@ function uploadWithProgress(
   });
 }
 
-const realApi = {
+export const api = {
   listFiles: () => request<FileItem[]>('/files'),
   getFile: (id: string) => request<FileItem>(`/files/${id}`),
   getResult: (id: string) => request<FileResult>(`/files/${id}/result`),
@@ -78,13 +76,11 @@ const realApi = {
   upload: uploadWithProgress,
 };
 
-export type Api = typeof realApi;
-export const api: Api = USE_MOCK ? mockApi : realApi;
 
 export type BackendState = 'online' | 'degraded' | 'offline';
 
 /**
- * Llamada rápida a /api/health contra la API real, también en modo demo, para saber si está levantada.
+ * Llamada rápida a /api/health para saber si la API está levantada.
  * online: 200 y status "ok" · degraded: responde pero con 503 · offline: sin respuesta, error del proxy o timeout.
  */
 export async function pingBackend(timeoutMs = 4000): Promise<{ state: BackendState; ms: number; version?: string }> {

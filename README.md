@@ -25,7 +25,6 @@ Aplicación web para **subir archivos** y seguir cómo los procesa el backend de
 - Estado de la API a la vista: indicador en la cabecera (con latencia), aviso si deja de responder y panel en **Conexión** con el historial de comprobaciones. Se comprueba cada 15 s y al pulsar el indicador.
 - Indicadores de carga en cada acción que espera a la API (actualizar, reprocesar, eliminar, descargar, subir).
 - Modo día (por defecto) y modo noche a elección del usuario. Diseño fluido: ocupa toda la pantalla en monitores anchos; en tablet la barra lateral se compacta y en móvil pasa a una barra inferior con la tabla en tarjetas.
-- **Modo demo:** funciona sin backend, con datos simulados en el navegador.
 
 ## Requisitos
 
@@ -81,7 +80,7 @@ pnpm dev
 
 **5. Abrir la aplicación** en http://localhost:5173
 
-Por defecto arranca en **modo demo** (`VITE_USE_MOCK=true`), así que no necesitas el backend para probarla. Los cambios en `src/` se aplican al instante. Para detener el servidor, pulsa `Ctrl + C` en la terminal.
+Todos los datos vienen de la API .NET, así que tiene que estar levantada (ver [Conectar con el backend .NET](#conectar-con-el-backend-net)); si no responde, la aplicación lo indica en la cabecera. Los cambios en `src/` se aplican al instante. Para detener el servidor, pulsa `Ctrl + C` en la terminal.
 
 ### Desde Visual Studio Code
 
@@ -98,7 +97,6 @@ Variables del archivo `.env`:
 
 | Variable | Descripción | Valor por defecto |
 |---|---|---|
-| `VITE_USE_MOCK` | `true`: backend simulado en el navegador. `false`: usa la API real | `true` |
 | `VITE_BACKEND_URL` | URL del backend .NET a la que Vite reenvía las peticiones a `/api` en desarrollo | `http://localhost:5254` |
 | `VITE_MAX_FILE_MB` | Tamaño máximo por archivo que admite el frontal, en MB | `50` |
 
@@ -118,8 +116,7 @@ Antes de subir cambios, `pnpm build` debe terminar sin errores.
 ## Conectar con el backend .NET
 
 1. Arranca la API .NET.
-2. En el `.env`, pon `VITE_USE_MOCK=false`. `VITE_BACKEND_URL` ya apunta al perfil `http` de la API (`http://localhost:5254`); cámbialo solo si la levantas en otra URL (por ejemplo `https://localhost:7233` con el perfil `https`).
-3. Reinicia `pnpm dev`.
+2. `VITE_BACKEND_URL` ya apunta al perfil `http` de la API (`http://localhost:5254`). Cámbialo en el `.env` solo si la levantas en otra URL (por ejemplo `https://localhost:7233` con el perfil `https`) y reinicia `pnpm dev`.
 
 En desarrollo, Vite actúa de **proxy**: todas las peticiones a `/api/*` se reenvían a `VITE_BACKEND_URL`. Así no hace falta configurar CORS en el backend, y se acepta el certificado HTTPS de desarrollo de .NET.
 
@@ -143,7 +140,7 @@ Instala las dependencias en la misma plataforma donde vas a ejecutar el proyecto
 
 ```
 src/
-  api/          types.ts (DTOs) · client.ts (fetch/XHR) · mock.ts (backend simulado)
+  api/          types.ts (DTOs) · client.ts (fetch/XHR y comprobación de salud)
   hooks/        useFiles (listado + sondeo) · useUploads (cola de subida) · useBackendStatus (salud de la API) · useTheme
   components/   Sidebar, Header, StatCards, Dropzone, UploadQueue, FileList, FileDetail, FilePreview, BackendStatus, Loader, AsyncButton…
   styles/       index.css (tokens de diseño + responsive)
@@ -169,4 +166,4 @@ pnpm install
 Esa variable de entorno está definida en tu sistema y desactiva la verificación de certificados TLS en todo lo que ejecuta Node. El proyecto no la necesita: si no la configuraste a propósito (por ejemplo, por un proxy corporativo), elimínala de las variables de entorno.
 
 **La aplicación no conecta con el backend.**
-Comprueba que la API está arrancada, que `VITE_USE_MOCK=false` y que `VITE_BACKEND_URL` coincide con la URL de la API. Recuerda reiniciar `pnpm dev` tras cambiar el `.env`.
+Comprueba que la API está arrancada y que `VITE_BACKEND_URL` coincide con su URL. El estado aparece en la cabecera y con más detalle en la vista **Conexión**. Recuerda reiniciar `pnpm dev` tras cambiar el `.env`.

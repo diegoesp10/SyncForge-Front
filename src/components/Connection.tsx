@@ -11,10 +11,10 @@ const endpoints = [
   ['DELETE', '/api/files/{id}', 'Eliminar archivo'],
 ];
 
-export function Connection({ backend, mock }: { backend: BackendStatus; mock: boolean }) {
+export function Connection({ backend }: { backend: BackendStatus }) {
   return (
     <div className="grid-2">
-      <BackendPanel status={backend} mock={mock} />
+      <BackendPanel status={backend} />
       <section className="card">
         <div className="card-head"><h3>Endpoints</h3><span className="count">{endpoints.length}</span></div>
         <ul className="endpoints">

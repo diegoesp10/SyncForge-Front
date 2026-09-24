@@ -26,12 +26,11 @@ function ago(at: number | null, now: number) {
 }
 
 /** Píldora de la cabecera: estado de la API de un vistazo; al pulsarla comprueba al momento. */
-export function BackendPill({ status, mock }: { status: BackendStatus; mock: boolean }) {
+export function BackendPill({ status }: { status: BackendStatus }) {
   const shown = status.checking && status.state === 'checking' ? 'checking' : status.state;
   const c = copy[shown];
   return (
     <div className="backend-pill-wrap">
-      {mock && <span className="demo-chip" title="Los datos del panel son simulados (VITE_USE_MOCK=true)">Demo</span>}
       <button
         className={`conn conn-${c.tone} ${status.checking ? 'is-checking' : ''}`}
         onClick={() => void status.check()}
@@ -47,7 +46,7 @@ export function BackendPill({ status, mock }: { status: BackendStatus; mock: boo
 }
 
 /** Tarjeta de la vista Conexión: señal grande, datos de la última comprobación y pulso de latencia. */
-export function BackendPanel({ status, mock }: { status: BackendStatus; mock: boolean }) {
+export function BackendPanel({ status }: { status: BackendStatus }) {
   const now = useNow();
   const shown = status.state;
   const c = copy[shown];
@@ -103,16 +102,11 @@ export function BackendPanel({ status, mock }: { status: BackendStatus; mock: bo
         </AsyncButton>
       </div>
 
-      {mock && (
-        <p className="backend-note">
-          <b>Modo demo:</b> los archivos del panel son simulados (<code>VITE_USE_MOCK=true</code>). Este estado es el de la API real.
-        </p>
-      )}
     </section>
   );
 }
 
-/** Aviso fijo en la parte superior cuando la API real no responde (fuera del modo demo). */
+/** Aviso en la parte superior cuando la API no responde. */
 export function OfflineBanner({ status }: { status: BackendStatus }) {
   if (status.state !== 'offline' && status.state !== 'degraded') return null;
   return (

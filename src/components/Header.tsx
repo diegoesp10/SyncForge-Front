@@ -8,14 +8,13 @@ interface Props {
   title: string;
   subtitle: string;
   backend: BackendStatus;
-  mock: boolean;
   theme: Theme;
   onTheme: (t: Theme, origin: { x: number; y: number }) => void;
 }
 
 const today = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
 
-export function Header({ title, subtitle, backend, mock, theme, onTheme }: Props) {
+export function Header({ title, subtitle, backend, theme, onTheme }: Props) {
   return (
     <header className="topbar">
       <div className="topbar-mobile-logo"><Logo /></div>
@@ -25,7 +24,7 @@ export function Header({ title, subtitle, backend, mock, theme, onTheme }: Props
         <p>{subtitle}</p>
       </div>
       <div className="topbar-actions">
-        <BackendPill status={backend} mock={mock} />
+        <BackendPill status={backend} />
         <ThemeSwitch theme={theme} onChange={onTheme} />
       </div>
     </header>

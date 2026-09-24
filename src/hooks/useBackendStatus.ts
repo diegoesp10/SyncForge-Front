@@ -12,7 +12,7 @@ const HISTORY = 20;
 const MIN_CHECK_MS = 450;
 
 /**
- * Comprueba /api/health contra la API real (también en modo demo) cada 15 s y bajo demanda.
+ * Comprueba /api/health cada 15 s y bajo demanda.
  * Guarda las últimas comprobaciones para dibujar el pulso de latencia.
  */
 export function useBackendStatus() {

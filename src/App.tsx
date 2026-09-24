@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { USE_MOCK } from './api/client';
 import type { FileItem } from './api/types';
 import { useFiles } from './hooks/useFiles';
 import { useUploads } from './hooks/useUploads';
@@ -78,10 +77,10 @@ export default function App() {
     <div className="app">
       <Sidebar view={view} onChange={setView} />
       <main className="main">
-        <Header title={title} subtitle={subtitle} backend={backend} mock={USE_MOCK} theme={theme} onTheme={setTheme} />
+        <Header title={title} subtitle={subtitle} backend={backend} theme={theme} onTheme={setTheme} />
 
         <div className="content" key={view}>
-          {!USE_MOCK && <OfflineBanner status={backend} />}
+          <OfflineBanner status={backend} />
           {view === 'dashboard' && (
             <div className="dash">
               <StatCards files={files} />
@@ -106,7 +105,7 @@ export default function App() {
             <FileList files={files} loading={loading} error={error} onOpen={open} onRefresh={refresh} />
           )}
 
-          {view === 'connection' && <Connection backend={backend} mock={USE_MOCK} />}
+          {view === 'connection' && <Connection backend={backend} />}
         </div>
       </main>
 
